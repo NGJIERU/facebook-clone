@@ -39,6 +39,18 @@ spec:
                 secretKeyRef:
                   name: jwt-secret
                   key: secret-key
+          livenessProbe:
+            httpGet:
+              path: /api/auth/actuator/health
+              port: 8080
+            initialDelaySeconds: 60
+            periodSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /api/auth/actuator/health
+              port: 8080
+            initialDelaySeconds: 30
+            periodSeconds: 5
 
 ---
 apiVersion: v1

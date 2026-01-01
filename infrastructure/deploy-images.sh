@@ -22,7 +22,7 @@ build_and_push() {
     cd backend/$SERVICE-service
     
     echo "Building Docker Image (with Maven)..."
-    docker build --platform linux/amd64 -t $REPO_NAME .
+    docker build --no-cache --platform linux/amd64 -t $REPO_NAME .
     docker tag $REPO_NAME:latest $IMAGE_URI
 
     echo "Pushing to ECR..."

@@ -19,7 +19,7 @@ spec:
         - containerPort: 8082
         env:
         - name: SPRING_DATASOURCE_URL
-          value: jdbc:postgresql://postgres:5432/feed_db
+          value: jdbc:postgresql://postgres-service:5432/feed_db
         - name: SPRING_DATASOURCE_USERNAME
           valueFrom:
             secretKeyRef:
@@ -37,6 +37,18 @@ spec:
               key: secret-key
         - name: SPRING_KAFKA_BOOTSTRAP_SERVERS
           value: kafka:9092
+        livenessProbe:
+          httpGet:
+            path: /api/feed/actuator/health
+            port: 8082
+          initialDelaySeconds: 60
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /api/feed/actuator/health
+            port: 8082
+          initialDelaySeconds: 30
+          periodSeconds: 5
 ---
 apiVersion: v1
 kind: Service

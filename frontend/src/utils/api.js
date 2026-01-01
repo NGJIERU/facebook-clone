@@ -1,7 +1,8 @@
 import axios from 'axios';
 
 const api = axios.create({
-    baseURL: '/api/auth', // Relative path for Service Mesh / LoadBalancer
+    baseURL: '/api/auth', // Service Mesh Routing
+    // CACHE_BUST_ID: 12345
     headers: {
         'Content-Type': 'application/json',
     },

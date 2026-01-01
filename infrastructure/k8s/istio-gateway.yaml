@@ -30,7 +30,7 @@ spec:
     - destination:
         host: auth-service
         port:
-          number: 8080
+          number: 80
   - match:
     - uri:
         prefix: /api/user

@@ -42,6 +42,26 @@ spec:
           value: "0"
         - name: KAFKA_NUM_PARTITIONS
           value: "3"
+        - name: CLUSTER_ID
+          value: "MkU3OEVBNTcwNTJENDM2Qk"
+        - name: KAFKA_LOG_DIRS
+          value: "/var/lib/kafka/data"
+        volumeMounts:
+        - name: kafka-storage
+          mountPath: /var/lib/kafka/data
+        command:
+        - /bin/bash
+        - -c
+        - |
+          # Format storage if not already formatted
+          if [ ! -f /var/lib/kafka/data/meta.properties ]; then
+            kafka-storage format -t $CLUSTER_ID -c /etc/kafka/kraft/server.properties --ignore-formatted || true
+          fi
+          # Start Kafka
+          /etc/confluent/docker/run
+      volumes:
+      - name: kafka-storage
+        emptyDir: {}
 ---
 apiVersion: v1
 kind: Service

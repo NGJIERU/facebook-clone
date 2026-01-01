@@ -1,11 +1,7 @@
 server:
   port: 8082
-  servlet:
-    context-path: /api/feed
 
 spring:
-  graphql:
-    path: /graphql
   application:
     name: feed-service
 
