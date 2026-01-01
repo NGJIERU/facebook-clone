@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@apollo/client": "^3.14.0",
+    "@stomp/stompjs": "^7.2.1",
     "@vue/apollo-composable": "^4.2.2",
     "axios": "^1.13.2",
     "graphql": "^16.12.0",

@@ -1,0 +1,10 @@
+CREATE TABLE notifications (
+    id BIGSERIAL PRIMARY KEY,
+    recipient_id VARCHAR(255) NOT NULL,
+    sender_id VARCHAR(255) NOT NULL,
+    type VARCHAR(50) NOT NULL,
+    message VARCHAR(255) NOT NULL,
+    resource_id VARCHAR(255) NOT NULL,
+    is_read BOOLEAN NOT NULL DEFAULT FALSE,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);

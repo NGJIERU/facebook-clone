@@ -25,6 +25,16 @@ export default defineConfig({
         target: 'http://localhost:8085',
         changeOrigin: true,
       },
+      '/api/notifications': {
+        target: 'http://localhost:8084',
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/api\/notifications/, '/api/notifications'), // No rewrite needed if controller matches, but ensuring consistency
+      },
+      '/ws': {
+        target: 'http://localhost:8084',
+        ws: true,
+        changeOrigin: true,
+      },
     },
   },
 })
