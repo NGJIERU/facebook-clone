@@ -1,0 +1,91 @@
+version: '3.8'
+
+services:
+  # 🗄️ Database (Simulates AWS RDS)
+  postgres:
+    image: postgres:15
+    container_name: facebook-postgres
+    ports:
+      - "5432:5432" # Exposed for local tools (DBeaver etc.)
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: default_db # Ignored, we use init.sql
+    volumes:
+      - ./postgres-data:/var/lib/postgresql/data
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql # Database initialization
+    networks:
+      - facebook-network
+
+  # ⚡ Cache (Simulates ElastiCache)
+  redis:
+    image: redis:7-alpine
+    container_name: facebook-redis
+    ports:
+      - "6379:6379"
+    networks:
+      - facebook-network
+
+  # 🌊 Event Streaming (Core Infrastructure)
+  zookeeper:
+    image: confluentinc/cp-zookeeper:7.5.0
+    container_name: facebook-zookeeper
+    ports:
+      - "2181:2181"
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+    networks:
+      - facebook-network
+
+  kafka:
+    image: confluentinc/cp-kafka:7.5.0
+    container_name: facebook-kafka
+    depends_on:
+      - zookeeper
+    ports:
+      - "9092:9092"
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:29092,PLAINTEXT_HOST://localhost:9092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+    networks:
+      - facebook-network
+
+  # 🪣 Object Storage (Simulates S3)
+  minio:
+    image: minio/minio
+    container_name: facebook-minio
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    environment:
+      MINIO_ROOT_USER: admin
+      MINIO_ROOT_PASSWORD: password
+    command: server /data --console-address ":9001"
+    volumes:
+      - ./minio-data:/data
+    networks:
+      - facebook-network
+
+  # 🖼️ Create default bucket in MinIO
+  minio-create-bucket:
+    image: minio/mc
+    depends_on:
+      - minio
+    entrypoint: >
+      /bin/sh -c "
+      /usr/bin/mc alias set myminio http://minio:9000 admin password;
+      /usr/bin/mc mb myminio/media-bucket;
+      /usr/bin/mc anonymous set public myminio/media-bucket;
+      exit 0;
+      "
+    networks:
+      - facebook-network
+
+networks:
+  facebook-network:
+    driver: bridge
