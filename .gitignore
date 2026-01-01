@@ -31,3 +31,4 @@ yarn-error.log
 
 # External Assets
 tailwindui/
+infrastructure/k8s/secrets.yaml

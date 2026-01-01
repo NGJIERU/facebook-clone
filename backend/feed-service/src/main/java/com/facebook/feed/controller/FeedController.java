@@ -9,6 +9,7 @@ import org.springframework.graphql.data.method.annotation.MutationMapping;
 import org.springframework.graphql.data.method.annotation.QueryMapping;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.time.Instant;
 import java.util.List;
@@ -19,6 +20,8 @@ import java.util.List;
 public class FeedController {
 
     private final FeedPostRepository repository;
+    private final org.springframework.kafka.core.KafkaTemplate<String, String> kafkaTemplate;
+    private final ObjectMapper objectMapper;
 
     @QueryMapping
     public List<FeedPost> getFeed() {
@@ -33,18 +36,36 @@ public class FeedController {
     @MutationMapping
     public FeedPost createPost(@Argument String content, @Argument String imageUrl) {
         String userEmail = (String) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        // In real app, we resolve email -> UUID via User Service or JWT claim
 
         FeedPost post = FeedPost.builder()
                 .content(content)
                 .imageUrl(imageUrl)
-                .authorId(userEmail) // Using email as ID for simple prototype
+                .authorId(userEmail)
                 .createdAt(Instant.now())
                 .likesCount(0)
                 .commentsCount(0)
                 .build();
 
         log.info("Creating post for user: {}", userEmail);
-        return repository.save(post);
+        FeedPost savedPost = repository.save(post);
+
+        // Publish Event
+        try {
+            com.facebook.feed.event.PostCreatedEvent event = com.facebook.feed.event.PostCreatedEvent.builder()
+                    .postId(savedPost.getId().toString())
+                    .authorId(savedPost.getAuthorId())
+                    .contentSnippet(savedPost.getContent().length() > 20 ? savedPost.getContent().substring(0, 20)
+                            : savedPost.getContent())
+                    .createdAt(savedPost.getCreatedAt())
+                    .build();
+
+            String eventJson = objectMapper.writeValueAsString(event);
+            kafkaTemplate.send("post-created-topic", eventJson);
+            log.info("Published PostCreatedEvent to Kafka: {}", eventJson);
+        } catch (Exception e) {
+            log.error("Failed to publish Kafka event", e);
+        }
+
+        return savedPost;
     }
 }
