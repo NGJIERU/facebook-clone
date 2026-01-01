@@ -14,8 +14,8 @@ spec:
     spec:
       containers:
       - name: frontend
-        # Placeholder image, will be built/pushed shortly
         image: 991370224656.dkr.ecr.us-east-1.amazonaws.com/facebook-frontend:latest
+        imagePullPolicy: Always
         ports:
         - containerPort: 80
 ---
@@ -24,7 +24,7 @@ kind: Service
 metadata:
   name: frontend
 spec:
-  type: LoadBalancer 
+  type: ClusterIP 
   selector:
     app: frontend
   ports:

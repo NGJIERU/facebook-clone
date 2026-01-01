@@ -40,7 +40,7 @@ build_frontend() {
     IMAGE_URI="$ECR_URL/$REPO_NAME:latest"
 
     cd frontend
-    docker build --platform linux/amd64 -t $REPO_NAME .
+    docker build --no-cache --platform linux/amd64 -t $REPO_NAME .
     docker tag $REPO_NAME:latest $IMAGE_URI
     
     echo "Pushing configuration..."
