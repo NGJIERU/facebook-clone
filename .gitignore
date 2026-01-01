@@ -28,3 +28,6 @@ npm-debug.log
 yarn-error.log
 .env
 .env.local
+
+# External Assets
+tailwindui/
