@@ -5,8 +5,18 @@ import { setContext } from '@apollo/client/link/context'
 
 // HTTP connection to the API
 const httpLink = createHttpLink({
-    // Connecting to Feed Service locally
-    uri: 'http://localhost:8082/graphql',
+    uri: (operation) => {
+        const operationName = operation.operationName;
+        const context = operation.getContext();
+
+        // Route to User Service if explicitly requested or inferred
+        if (context.service === 'user' || operationName?.startsWith('User')) {
+            return '/api/user/graphql';
+        }
+
+        // Default to Feed Service
+        return '/api/feed/graphql';
+    }
 })
 
 const authLink = setContext((_, { headers }) => {

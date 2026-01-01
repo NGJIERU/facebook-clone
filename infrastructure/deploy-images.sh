@@ -1,6 +1,7 @@
 #!/bin/bash
 set -e
 
+export PATH=$PATH:/opt/homebrew/bin
 REGION="us-east-1"
 ACCOUNT_ID="991370224656"
 ECR_URL="$ACCOUNT_ID.dkr.ecr.$REGION.amazonaws.com"
