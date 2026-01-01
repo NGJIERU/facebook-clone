@@ -17,8 +17,8 @@ spec:
     spec:
       containers:
         - name: auth-service
-          image: facebook-auth:latest # Replace with ECR URI later
-          imagePullPolicy: IfNotPresent
+          image: 991370224656.dkr.ecr.us-east-1.amazonaws.com/facebook-auth:latest
+          imagePullPolicy: Always
           ports:
             - containerPort: 8080
           env:
