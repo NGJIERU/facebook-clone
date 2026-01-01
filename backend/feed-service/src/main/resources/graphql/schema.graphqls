@@ -1,0 +1,18 @@
+type FeedPost {
+    id: ID!
+    authorId: String!
+    content: String
+    imageUrl: String
+    createdAt: String
+    likesCount: Int
+    commentsCount: Int
+}
+
+type Query {
+    getFeed: [FeedPost]
+    getUserPosts(authorId: String!): [FeedPost]
+}
+
+type Mutation {
+    createPost(content: String!, imageUrl: String): FeedPost
+}
