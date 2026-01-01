@@ -6,6 +6,7 @@ import gql from 'graphql-tag';
 import { computed } from 'vue';
 import PostCard from '../components/PostCard.vue';
 import CreatePost from '../components/CreatePost.vue';
+import NotificationDropdown from '../components/NotificationDropdown.vue';
 
 const authStore = useAuthStore();
 const router = useRouter();
@@ -41,10 +42,19 @@ const handlePostCreated = () => {
     <!-- Navbar -->
     <nav class="bg-white shadow sticky top-0 z-50">
       <div class="container mx-auto px-4 h-16 flex justify-between items-center">
-        <h1 class="text-2xl font-bold text-blue-600">Facebook</h1>
-        <div class="flex items-center gap-4">
-          <span class="font-medium text-gray-700">Hello, {{ authStore.user?.username }}</span>
-          <button @click="handleLogout" class="text-gray-600 hover:text-red-600 transition font-medium">Logout</button>
+        <h1 class="text-2xl font-bold text-blue-600 cursor-pointer" @click="router.push('/')">Facebook</h1>
+        
+        <div class="flex items-center gap-6">
+          <NotificationDropdown />
+          
+          <div class="flex items-center gap-2">
+              <div class="bg-blue-100 w-8 h-8 rounded-full flex items-center justify-center text-blue-600 font-bold text-sm">
+                  {{ authStore.user?.username?.charAt(0).toUpperCase() }}
+              </div>
+              <span class="font-medium text-gray-700 hidden sm:block">{{ authStore.user?.username }}</span>
+          </div>
+          
+          <button @click="handleLogout" class="text-gray-500 hover:text-red-600 transition font-medium text-sm">Logout</button>
         </div>
       </div>
     </nav>
