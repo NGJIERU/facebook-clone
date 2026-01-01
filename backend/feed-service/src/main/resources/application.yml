@@ -1,0 +1,51 @@
+server:
+  port: 8083
+
+spring:
+  application:
+    name: feed-service
+
+  threads:
+    virtual:
+      enabled: true
+  
+  datasource:
+    url: jdbc:postgresql://localhost:5432/feed_db
+    username: admin
+    password: password
+    driver-class-name: org.postgresql.Driver
+  
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+  
+  flyway:
+    enabled: true
+    baseline-on-migrate: true
+    
+  graphql:
+    graphiql:
+      enabled: true
+      path: /graphiql
+
+  data:
+    redis:
+      host: localhost
+      port: 6379
+    elasticsearch:
+      client:
+        reactive:
+          endpoints: localhost:9200
+
+  kafka:
+    bootstrap-servers: localhost:9092
+    consumer:
+      group-id: feed-group
+      auto-offset-reset: earliest
+
+logging:
+  level:
+    org.springframework.web: INFO
