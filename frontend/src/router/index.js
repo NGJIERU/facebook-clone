@@ -1,19 +1,39 @@
-import { createRouter, createWebHistory } from 'vue-router'
+import { createRouter, createWebHistory } from 'vue-router';
+import { useAuthStore } from '../stores/auth';
+import Login from '../views/Login.vue';
+import Register from '../views/Register.vue';
+import Feed from '../views/Feed.vue';
 
 const router = createRouter({
     history: createWebHistory(import.meta.env.BASE_URL),
     routes: [
         {
-            path: '/',
-            name: 'home',
-            component: () => import('../views/HomeView.vue')
+            path: '/login',
+            name: 'login',
+            component: Login
         },
         {
-            path: '/about',
-            name: 'about',
-            component: () => import('../views/AboutView.vue')
+            path: '/register',
+            name: 'register',
+            component: Register
+        },
+        {
+            path: '/',
+            name: 'feed',
+            component: Feed,
+            meta: { requiresAuth: true }
         }
     ]
-})
+});
 
-export default router
+router.beforeEach((to, from, next) => {
+    const authStore = useAuthStore();
+
+    if (to.meta.requiresAuth && !authStore.isAuthenticated) {
+        next('/login');
+    } else {
+        next();
+    }
+});
+
+export default router;

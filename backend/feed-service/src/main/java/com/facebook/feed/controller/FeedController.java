@@ -35,7 +35,14 @@ public class FeedController {
 
     @MutationMapping
     public FeedPost createPost(@Argument String content, @Argument String imageUrl) {
-        String userEmail = (String) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        var authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null ||
+                !authentication.isAuthenticated() ||
+                "anonymousUser".equals(authentication.getPrincipal())) {
+            throw new RuntimeException("Access Denied: You must be logged in to create a post.");
+        }
+
+        String userEmail = (String) authentication.getPrincipal();
 
         FeedPost post = FeedPost.builder()
                 .content(content)
