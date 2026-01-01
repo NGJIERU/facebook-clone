@@ -1,0 +1,30 @@
+# OS
+.DS_Store
+
+# IDEs
+.idea/
+.vscode/
+*.iml
+*.swp
+
+# Maven / Java
+target/
+*.class
+*.log
+.mvn/
+mvnw
+mvnw.cmd
+
+# Docker (Local Data Volumes)
+postgres-data/
+minio-data/
+redis-data/
+kafka-data/
+
+# Frontend (Node.js)
+node_modules/
+dist/
+npm-debug.log
+yarn-error.log
+.env
+.env.local
