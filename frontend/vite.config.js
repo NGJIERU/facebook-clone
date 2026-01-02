@@ -19,10 +19,14 @@ export default defineConfig({
         target: 'http://localhost:8081',
         changeOrigin: true,
       },
+      '/api/feed/graphql': {
+        target: 'http://localhost:8082',
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/api\/feed\/graphql/, '/graphql'),
+      },
       '/api/feed': {
         target: 'http://localhost:8082',
         changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/api\/feed/, ''),
       },
       '/api/media': {
         target: 'http://localhost:8085',
