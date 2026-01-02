@@ -1,5 +1,5 @@
 <template>
-  <div class="bg-white rounded-lg shadow p-4 mb-6">
+  <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-4 mb-6">
     <div class="flex gap-4 overflow-x-auto pb-2">
       <!-- Create Story Button -->
       <div 

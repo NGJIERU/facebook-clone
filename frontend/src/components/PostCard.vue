@@ -203,7 +203,7 @@ const isSharedPost = computed(() => !!props.post.originalPostId);
 </script>
 
 <template>
-  <div class="bg-white p-4 rounded-lg shadow mb-4">
+  <div class="bg-white dark:bg-gray-800 p-4 rounded-lg shadow mb-4">
     <div class="flex items-center justify-between mb-4">
       <div class="flex items-center">
         <div 
@@ -215,8 +215,8 @@ const isSharedPost = computed(() => !!props.post.originalPostId);
           <span v-else class="text-gray-600 font-bold">{{ displayName?.charAt(0)?.toUpperCase() || 'U' }}</span>
         </div>
         <div>
-          <h3 @click="goToAuthorProfile" class="font-bold text-gray-800 cursor-pointer hover:underline">{{ displayName }}</h3>
-          <p class="text-xs text-gray-500">{{ formattedDate }}</p>
+          <h3 @click="goToAuthorProfile" class="font-bold text-gray-800 dark:text-gray-100 cursor-pointer hover:underline">{{ displayName }}</h3>
+          <p class="text-xs text-gray-500 dark:text-gray-400">{{ formattedDate }}</p>
         </div>
       </div>
       <button 
@@ -235,10 +235,10 @@ const isSharedPost = computed(() => !!props.post.originalPostId);
       <span>Shared a post</span>
     </div>
     
-    <p v-if="post.content" class="text-gray-800 mb-4">{{ post.content }}</p>
+    <p v-if="post.content" class="text-gray-800 dark:text-gray-200 mb-4">{{ post.content }}</p>
 
     <!-- Original Post (for shared posts) -->
-    <div v-if="isSharedPost" class="border rounded-lg p-4 mb-4 bg-gray-50">
+    <div v-if="isSharedPost" class="border dark:border-gray-600 rounded-lg p-4 mb-4 bg-gray-50 dark:bg-gray-700">
       <div class="flex items-center gap-2 mb-2">
         <div class="w-8 h-8 rounded-full overflow-hidden bg-gray-300 flex items-center justify-center">
           <img v-if="originalAuthorPic" :src="originalAuthorPic" class="w-full h-full object-cover" />
@@ -277,29 +277,29 @@ const isSharedPost = computed(() => !!props.post.originalPostId);
     />
 
     <!-- Like/Comment counts -->
-    <div class="flex items-center gap-4 text-sm text-gray-500 mb-2">
+    <div class="flex items-center gap-4 text-sm text-gray-500 dark:text-gray-400 mb-2">
       <span v-if="likesCount > 0">👍 {{ likesCount }}</span>
       <span v-if="post.commentsCount > 0 || comments.length > 0">💬 {{ comments.length || post.commentsCount }}</span>
     </div>
     
-    <div class="flex items-center justify-between text-gray-500 text-sm border-t pt-3">
+    <div class="flex items-center justify-between text-gray-500 dark:text-gray-400 text-sm border-t dark:border-gray-600 pt-3">
       <button 
         @click="toggleLike"
-        :class="['flex items-center gap-1 px-4 py-2 rounded hover:bg-gray-100 transition', liked ? 'text-blue-600 font-semibold' : '']"
+        :class="['flex items-center gap-1 px-4 py-2 rounded hover:bg-gray-100 dark:hover:bg-gray-700 transition', liked ? 'text-blue-600 font-semibold' : '']"
       >
         <span>{{ liked ? '👍' : '👍' }}</span>
         <span>{{ liked ? 'Liked' : 'Like' }}</span>
       </button>
       <button 
         @click="toggleComments"
-        class="flex items-center gap-1 px-4 py-2 rounded hover:bg-gray-100 transition"
+        class="flex items-center gap-1 px-4 py-2 rounded hover:bg-gray-100 dark:hover:bg-gray-700 transition"
       >
         <span>💬</span>
         <span>Comment</span>
       </button>
       <button 
         @click="openShareModal"
-        class="flex items-center gap-1 px-4 py-2 rounded hover:bg-gray-100 transition"
+        class="flex items-center gap-1 px-4 py-2 rounded hover:bg-gray-100 dark:hover:bg-gray-700 transition"
       >
         <span>↗️</span>
         <span>Share{{ sharesCount > 0 ? ` (${sharesCount})` : '' }}</span>

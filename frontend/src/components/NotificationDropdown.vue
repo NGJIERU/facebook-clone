@@ -3,11 +3,14 @@ import { ref, onMounted, onUnmounted, watch } from 'vue';
 import { useNotificationStore } from '../stores/notification';
 import { formatDistanceToNow } from 'date-fns';
 import api from '../utils/api';
+import { usePushNotifications } from '../composables/usePushNotifications';
 
 const notificationStore = useNotificationStore();
+const { requestPermission, showNotification, permission } = usePushNotifications();
 const isOpen = ref(false);
 const dropdownRef = ref(null);
 const senderNames = ref({});
+const lastNotificationCount = ref(0);
 
 const toggleDropdown = () => {
   isOpen.value = !isOpen.value;
@@ -49,8 +52,28 @@ watch(() => notificationStore.history, async (notifications) => {
   }
 }, { immediate: true, deep: true });
 
+// Watch for new notifications and show browser push notification
+watch(() => notificationStore.history.length, (newCount) => {
+  if (newCount > lastNotificationCount.value && lastNotificationCount.value > 0) {
+    const latestNotification = notificationStore.history[0];
+    if (latestNotification && !latestNotification.read) {
+      const senderName = getSenderDisplayName(latestNotification.senderId);
+      showNotification('New Notification', {
+        body: `${senderName}: ${latestNotification.message}`,
+        tag: 'app-notification',
+      });
+    }
+  }
+  lastNotificationCount.value = newCount;
+});
+
 onMounted(() => {
   document.addEventListener('click', handleClickOutside);
+  // Request notification permission on mount
+  if (permission.value === 'default') {
+    requestPermission();
+  }
+  lastNotificationCount.value = notificationStore.history.length;
 });
 
 onUnmounted(() => {
