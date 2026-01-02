@@ -29,6 +29,16 @@ yarn-error.log
 .env
 .env.local
 
+# Terraform
+infrastructure/.terraform/
+infrastructure/.terraform.lock.hcl
+infrastructure/terraform.tfstate
+infrastructure/terraform.tfstate.backup
+*.tfstate
+*.tfstate.*
+.terraform/
+.terraform.lock.hcl
+
 # External Assets
 tailwindui/
 infrastructure/k8s/secrets.yaml
