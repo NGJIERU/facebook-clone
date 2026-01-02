@@ -3,10 +3,11 @@ import { computed, ref, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 import { useAuthStore } from '../stores/auth';
 import api from '../utils/api';
+import ImageLightbox from './ImageLightbox.vue';
 
 const router = useRouter();
 const authStore = useAuthStore();
-const emit = defineEmits(['post-deleted']);
+const emit = defineEmits(['post-deleted', 'post-shared']);
 
 const props = defineProps({
   post: {
@@ -19,12 +20,19 @@ const authorName = ref(null);
 const authorProfilePic = ref(null);
 const liked = ref(false);
 const likesCount = ref(props.post.likesCount || 0);
+const sharesCount = ref(props.post.sharesCount || 0);
 const showComments = ref(false);
 const comments = ref([]);
 const newComment = ref('');
 const loadingComments = ref(false);
 const commentAuthors = ref({});
 const isOwnPost = computed(() => authStore.user?.id === props.post.authorId);
+const showShareModal = ref(false);
+const shareComment = ref('');
+const sharing = ref(false);
+const originalAuthorName = ref(null);
+const originalAuthorPic = ref(null);
+const showLightbox = ref(false);
 
 onMounted(async () => {
   // Fetch author profile (name and picture)
@@ -37,6 +45,17 @@ onMounted(async () => {
       console.warn('Failed to fetch author profile', e);
       authorName.value = null;
       authorProfilePic.value = null;
+    }
+  }
+
+  // Fetch original author profile for shared posts
+  if (props.post.originalAuthorId) {
+    try {
+      const response = await api.get(`/users/profile/${props.post.originalAuthorId}`);
+      originalAuthorName.value = response.data.username;
+      originalAuthorPic.value = response.data.profilePicUrl;
+    } catch (e) {
+      console.warn('Failed to fetch original author profile', e);
     }
   }
   
@@ -154,6 +173,33 @@ const deletePost = async () => {
 const goToAuthorProfile = () => {
   router.push(`/profile/${props.post.authorId}`);
 };
+
+const openShareModal = () => {
+  showShareModal.value = true;
+  shareComment.value = '';
+};
+
+const closeShareModal = () => {
+  showShareModal.value = false;
+  shareComment.value = '';
+};
+
+const sharePost = async () => {
+  sharing.value = true;
+  try {
+    await api.post(`/feed/posts/${props.post.id}/share`, { comment: shareComment.value });
+    sharesCount.value++;
+    closeShareModal();
+    emit('post-shared');
+  } catch (e) {
+    console.error('Failed to share post', e);
+    alert('Failed to share post');
+  } finally {
+    sharing.value = false;
+  }
+};
+
+const isSharedPost = computed(() => !!props.post.originalPostId);
 </script>
 
 <template>
@@ -182,12 +228,53 @@ const goToAuthorProfile = () => {
         🗑️
       </button>
     </div>
-    
-    <p class="text-gray-800 mb-4">{{ post.content }}</p>
-    
-    <div v-if="post.imageUrl && !imageError" class="mb-4">
-      <img :src="post.imageUrl" alt="Post content" class="rounded-lg max-h-96 w-full object-cover" @error="imageError = true">
+
+    <!-- Shared post indicator -->
+    <div v-if="isSharedPost" class="text-xs text-gray-500 mb-2 flex items-center gap-1">
+      <span>↗️</span>
+      <span>Shared a post</span>
     </div>
+    
+    <p v-if="post.content" class="text-gray-800 mb-4">{{ post.content }}</p>
+
+    <!-- Original Post (for shared posts) -->
+    <div v-if="isSharedPost" class="border rounded-lg p-4 mb-4 bg-gray-50">
+      <div class="flex items-center gap-2 mb-2">
+        <div class="w-8 h-8 rounded-full overflow-hidden bg-gray-300 flex items-center justify-center">
+          <img v-if="originalAuthorPic" :src="originalAuthorPic" class="w-full h-full object-cover" />
+          <span v-else class="text-gray-600 font-bold text-sm">{{ originalAuthorName?.charAt(0)?.toUpperCase() || 'U' }}</span>
+        </div>
+        <span class="font-medium text-sm text-gray-700">{{ originalAuthorName || 'Unknown User' }}</span>
+      </div>
+      <div v-if="post.imageUrl && !imageError">
+        <img 
+          :src="post.imageUrl" 
+          alt="Shared content" 
+          class="rounded-lg max-h-64 w-full object-cover cursor-pointer hover:opacity-90 transition" 
+          @click="showLightbox = true"
+          @error="imageError = true"
+        >
+      </div>
+    </div>
+    
+    <!-- Regular post image -->
+    <div v-else-if="post.imageUrl && !imageError" class="mb-4">
+      <img 
+        :src="post.imageUrl" 
+        alt="Post content" 
+        class="rounded-lg max-h-96 w-full object-cover cursor-pointer hover:opacity-90 transition" 
+        @click="showLightbox = true"
+        @error="imageError = true"
+      >
+    </div>
+
+    <!-- Image Lightbox -->
+    <ImageLightbox 
+      :is-open="showLightbox" 
+      :image-url="post.imageUrl" 
+      :caption="post.content"
+      @close="showLightbox = false"
+    />
 
     <!-- Like/Comment counts -->
     <div class="flex items-center gap-4 text-sm text-gray-500 mb-2">
@@ -210,10 +297,52 @@ const goToAuthorProfile = () => {
         <span>💬</span>
         <span>Comment</span>
       </button>
-      <button class="flex items-center gap-1 px-4 py-2 rounded hover:bg-gray-100 transition">
+      <button 
+        @click="openShareModal"
+        class="flex items-center gap-1 px-4 py-2 rounded hover:bg-gray-100 transition"
+      >
         <span>↗️</span>
-        <span>Share</span>
+        <span>Share{{ sharesCount > 0 ? ` (${sharesCount})` : '' }}</span>
       </button>
+    </div>
+
+    <!-- Share Modal -->
+    <div v-if="showShareModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50" @click="closeShareModal">
+      <div class="bg-white rounded-lg p-6 w-full max-w-lg mx-4" @click.stop>
+        <h3 class="text-xl font-bold mb-4">Share this post</h3>
+        
+        <!-- Original Post Preview -->
+        <div class="bg-gray-50 rounded-lg p-4 mb-4 border">
+          <div class="flex items-center gap-2 mb-2">
+            <div class="w-8 h-8 rounded-full overflow-hidden bg-gray-300 flex items-center justify-center">
+              <img v-if="authorProfilePic" :src="authorProfilePic" class="w-full h-full object-cover" />
+              <span v-else class="text-gray-600 font-bold text-sm">{{ displayName?.charAt(0)?.toUpperCase() }}</span>
+            </div>
+            <span class="font-medium text-sm">{{ displayName }}</span>
+          </div>
+          <p class="text-gray-700 text-sm">{{ post.content }}</p>
+          <img v-if="post.imageUrl" :src="post.imageUrl" class="mt-2 rounded max-h-32 object-cover" />
+        </div>
+
+        <!-- Share Comment -->
+        <textarea 
+          v-model="shareComment"
+          placeholder="Add a comment (optional)..."
+          class="w-full border rounded-lg p-3 mb-4 focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
+          rows="3"
+        ></textarea>
+
+        <div class="flex justify-end gap-2">
+          <button @click="closeShareModal" class="px-4 py-2 text-gray-600 hover:bg-gray-100 rounded">Cancel</button>
+          <button 
+            @click="sharePost" 
+            :disabled="sharing"
+            class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 disabled:opacity-50"
+          >
+            {{ sharing ? 'Sharing...' : 'Share Now' }}
+          </button>
+        </div>
+      </div>
     </div>
 
     <!-- Comments Section -->

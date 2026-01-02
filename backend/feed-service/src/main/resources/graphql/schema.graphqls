@@ -6,6 +6,9 @@ type FeedPost {
     createdAt: String
     likesCount: Int
     commentsCount: Int
+    sharesCount: Int
+    originalPostId: ID
+    originalAuthorId: String
 }
 
 type Query {

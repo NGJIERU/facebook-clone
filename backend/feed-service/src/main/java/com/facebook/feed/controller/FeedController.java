@@ -207,4 +207,54 @@ public class FeedController {
                 })
                 .orElse(org.springframework.http.ResponseEntity.notFound().build());
     }
+
+    @org.springframework.web.bind.annotation.PostMapping("/api/feed/posts/{postId}/share")
+    public org.springframework.http.ResponseEntity<?> sharePost(
+            @org.springframework.web.bind.annotation.PathVariable java.util.UUID postId,
+            @org.springframework.web.bind.annotation.RequestBody(required = false) java.util.Map<String, String> body) {
+        var authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null || !authentication.isAuthenticated()) {
+            return org.springframework.http.ResponseEntity.status(401).body("Not authenticated");
+        }
+
+        String token = (String) authentication.getCredentials();
+        if (token == null) {
+            return org.springframework.http.ResponseEntity.status(401).body("Could not identify user");
+        }
+
+        final String currentUserId;
+        try {
+            currentUserId = extractUserIdFromToken("Bearer " + token);
+        } catch (Exception e) {
+            log.error("Failed to extract userId", e);
+            return org.springframework.http.ResponseEntity.status(401).body("Could not identify user");
+        }
+
+        return repository.findById(postId)
+                .map(originalPost -> {
+                    String shareComment = (body != null) ? body.get("comment") : null;
+                    
+                    FeedPost sharedPost = FeedPost.builder()
+                            .authorId(currentUserId)
+                            .content(shareComment)
+                            .imageUrl(originalPost.getImageUrl())
+                            .createdAt(java.time.Instant.now())
+                            .originalPostId(originalPost.getId())
+                            .originalAuthorId(originalPost.getAuthorId())
+                            .likesCount(0)
+                            .commentsCount(0)
+                            .sharesCount(0)
+                            .build();
+                    
+                    FeedPost saved = repository.save(sharedPost);
+                    
+                    // Increment share count on original post
+                    originalPost.setSharesCount(originalPost.getSharesCount() + 1);
+                    repository.save(originalPost);
+                    
+                    log.info("User {} shared post {}", currentUserId, postId);
+                    return org.springframework.http.ResponseEntity.ok(saved);
+                })
+                .orElse(org.springframework.http.ResponseEntity.notFound().build());
+    }
 }

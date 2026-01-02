@@ -17,13 +17,16 @@
     <div class="profile-container">
       <!-- Loading State -->
       <div v-if="loading" class="text-center py-20">
+        <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
         <p class="text-gray-600">Loading profile...</p>
       </div>
 
       <!-- Error State -->
-      <div v-else-if="error" class=" bg-red-50 border border-red-200 rounded-lg p-6 my-8">
-        <p class="text-red-600">{{ error }}</p>
-        <button @click="router.push('/')" class="mt-4 px-4 py-2 bg-blue-600 text-white rounded">Go to Feed</button>
+      <div v-else-if="error" class="bg-red-50 border border-red-200 rounded-lg p-6 my-8 text-center">
+        <div class="text-red-500 text-4xl mb-2">⚠️</div>
+        <h3 class="text-red-700 font-semibold mb-1">Unable to load profile</h3>
+        <p class="text-red-600 text-sm mb-3">{{ error }}</p>
+        <button @click="router.push('/')" class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">Go to Feed</button>
       </div>
 
       <!-- Profile Content -->

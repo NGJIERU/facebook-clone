@@ -8,6 +8,8 @@ import { computed, ref, onMounted } from 'vue';
 import PostCard from '../components/PostCard.vue';
 import CreatePost from '../components/CreatePost.vue';
 import NotificationDropdown from '../components/NotificationDropdown.vue';
+import LoadingSpinner from '../components/LoadingSpinner.vue';
+import StoriesBar from '../components/StoriesBar.vue';
 
 const authStore = useAuthStore();
 const friendStore = useFriendStore();
@@ -59,6 +61,10 @@ const handlePostCreated = () => {
 const handlePostDeleted = () => {
     refetch();
 };
+
+const handlePostShared = () => {
+    refetch();
+};
 </script>
 
 <template>
@@ -70,6 +76,9 @@ const handlePostDeleted = () => {
         
         <div class="flex items-center gap-6">
           <button @click="router.push('/friends')" class="text-gray-600 hover:text-blue-600 font-medium">Friends</button>
+          <button @click="router.push('/groups')" class="text-gray-600 hover:text-blue-600 font-medium">Groups</button>
+          <button @click="router.push('/events')" class="text-gray-600 hover:text-blue-600 font-medium">Events</button>
+          <button @click="router.push('/messages')" class="text-gray-600 hover:text-blue-600 font-medium">💬</button>
           <NotificationDropdown />
           
           <div class="flex items-center gap-2 cursor-pointer" @click="router.push('/profile')">
@@ -88,6 +97,9 @@ const handlePostDeleted = () => {
     <!-- Main Content -->
     <main class="container mx-auto px-4 py-8 flex justify-center">
       <div class="w-full max-w-2xl">
+        
+        <!-- Stories -->
+        <StoriesBar />
         
         <!-- Create Post -->
         <CreatePost @post-created="handlePostCreated" />
@@ -112,12 +124,17 @@ const handlePostDeleted = () => {
         </div>
 
         <!-- Feed Stream -->
-        <div v-if="loading" class="text-center py-10">
-            <div class="animate-spin rounded-full h-10 w-10 border-b-2 border-blue-600 mx-auto"></div>
+        <div v-if="loading" class="py-10">
+            <LoadingSpinner size="lg" text="Loading feed..." />
         </div>
 
-        <div v-else-if="error" class="text-center text-red-500 py-10">
-            Error loading feed. Is the backend running?
+        <div v-else-if="error" class="bg-red-50 border border-red-200 rounded-lg p-6 text-center">
+            <div class="text-red-500 text-4xl mb-2">⚠️</div>
+            <h3 class="text-red-700 font-semibold mb-1">Unable to load feed</h3>
+            <p class="text-red-600 text-sm mb-3">Please check if the backend is running.</p>
+            <button @click="refetch()" class="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 text-sm">
+                Try Again
+            </button>
         </div>
 
         <div v-else-if="posts.length === 0" class="text-center text-gray-500 py-10">
@@ -125,7 +142,7 @@ const handlePostDeleted = () => {
         </div>
 
         <div v-else class="feed-stream">
-            <PostCard v-for="post in posts" :key="post.id" :post="post" @post-deleted="handlePostDeleted" />
+            <PostCard v-for="post in posts" :key="post.id" :post="post" @post-deleted="handlePostDeleted" @post-shared="handlePostShared" />
         </div>
       </div>
     </main>

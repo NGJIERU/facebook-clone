@@ -1,4 +1,4 @@
-package com.facebook.feed.model;
+package com.facebook.user.model;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -14,29 +14,33 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "feed_posts")
-public class FeedPost {
+@Table(name = "events")
+public class Event {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
     @Column(nullable = false)
-    private String authorId; // Reference to User Service (no FK constraint across microservices)
+    private String title;
 
     @Column(columnDefinition = "TEXT")
-    private String content;
+    private String description;
 
-    private String imageUrl;
+    private String location;
+
+    private String coverImageUrl;
+
+    @Column(nullable = false)
+    private String creatorId;
+
+    @Column(nullable = false)
+    private Instant eventDate;
 
     @Column(nullable = false)
     private Instant createdAt;
 
-    private int likesCount;
-    private int commentsCount;
-    private int sharesCount;
+    private int attendeesCount;
 
-    // For shared posts - references the original post
-    private UUID originalPostId;
-    private String originalAuthorId;
+    private int interestedCount;
 }

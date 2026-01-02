@@ -14,29 +14,26 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "feed_posts")
-public class FeedPost {
+@Table(name = "stories")
+public class Story {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
     @Column(nullable = false)
-    private String authorId; // Reference to User Service (no FK constraint across microservices)
-
-    @Column(columnDefinition = "TEXT")
-    private String content;
+    private String authorId;
 
     private String imageUrl;
+
+    @Column(columnDefinition = "TEXT")
+    private String text;
 
     @Column(nullable = false)
     private Instant createdAt;
 
-    private int likesCount;
-    private int commentsCount;
-    private int sharesCount;
+    @Column(nullable = false)
+    private Instant expiresAt;
 
-    // For shared posts - references the original post
-    private UUID originalPostId;
-    private String originalAuthorId;
+    private int viewsCount;
 }
