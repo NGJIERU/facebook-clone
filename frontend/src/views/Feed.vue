@@ -71,35 +71,7 @@ const handlePostShared = () => {
 </script>
 
 <template>
-  <div class="min-h-screen bg-gray-100 dark:bg-gray-900">
-    <!-- Navbar -->
-    <nav class="bg-white dark:bg-gray-800 shadow sticky top-0 z-50">
-      <div class="container mx-auto px-4 h-16 flex justify-between items-center">
-        <h1 class="text-2xl font-bold text-blue-600 cursor-pointer" @click="router.push('/')">Facebook</h1>
-        
-        <GlobalSearch />
-        
-        <div class="flex items-center gap-6">
-          <button @click="router.push('/friends')" class="text-gray-600 dark:text-gray-300 hover:text-blue-600 font-medium">Friends</button>
-          <button @click="router.push('/groups')" class="text-gray-600 dark:text-gray-300 hover:text-blue-600 font-medium">Groups</button>
-          <button @click="router.push('/events')" class="text-gray-600 dark:text-gray-300 hover:text-blue-600 font-medium">Events</button>
-          <button @click="router.push('/saved')" class="text-gray-600 dark:text-gray-300 hover:text-blue-600 font-medium">🔖</button>
-          <button @click="router.push('/messages')" class="text-gray-600 dark:text-gray-300 hover:text-blue-600 font-medium">💬</button>
-          <NotificationDropdown />
-          <ThemeToggle />
-          
-          <div class="flex items-center gap-2 cursor-pointer" @click="router.push('/profile')">
-              <div class="bg-blue-100 w-8 h-8 rounded-full overflow-hidden flex items-center justify-center text-blue-600 font-bold text-sm">
-                  <img v-if="authStore.user?.profilePicUrl" :src="authStore.user.profilePicUrl" class="w-full h-full object-cover" />
-                  <span v-else>{{ authStore.user?.username?.charAt(0).toUpperCase() }}</span>
-              </div>
-              <span class="font-medium text-gray-700 dark:text-gray-300 hidden sm:block">{{ authStore.user?.username }}</span>
-          </div>
-          
-          <button @click="handleLogout" class="text-gray-500 hover:text-red-600 transition font-medium text-sm">Logout</button>
-        </div>
-      </div>
-    </nav>
+  <div class="min-h-screen bg-gray-100 dark:bg-gray-900 pt-16">
 
     <!-- Main Content -->
     <main class="container mx-auto px-4 py-8 flex justify-center">

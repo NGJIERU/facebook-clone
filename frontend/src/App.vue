@@ -2,9 +2,12 @@
 import { useAuthStore } from './stores/auth';
 import { useNotificationStore } from './stores/notification';
 import { watch, onMounted } from 'vue';
+import { useRoute } from 'vue-router';
+import NavBar from './components/NavBar.vue';
 
 const authStore = useAuthStore();
 const notificationStore = useNotificationStore();
+const route = useRoute();
 
 // Connect if logged in on mount (only if user has id)
 onMounted(() => {
@@ -21,9 +24,16 @@ watch(() => authStore.user, (newUser) => {
     notificationStore.disconnect();
   }
 });
+
+// Check if current route should show navbar
+const showNavBar = () => {
+  const publicRoutes = ['/login', '/register', '/forgot-password'];
+  return !publicRoutes.includes(route.path);
+};
 </script>
 
 <template>
+  <NavBar v-if="showNavBar()" />
   <router-view></router-view>
   
   <!-- Notification Toast Container -->
@@ -31,7 +41,7 @@ watch(() => authStore.user, (newUser) => {
     <div 
       v-for="(notification, index) in notificationStore.notifications" 
       :key="index"
-      class="bg-white border-l-4 border-blue-500 text-gray-800 px-4 py-3 rounded shadow-lg max-w-sm pointer-events-auto flex items-start gap-3"
+      class="bg-white dark:bg-gray-800 border-l-4 border-blue-500 text-gray-800 dark:text-gray-200 px-4 py-3 rounded shadow-lg max-w-sm pointer-events-auto flex items-start gap-3"
     >
         <div class="text-blue-500 mt-1">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">

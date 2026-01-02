@@ -53,16 +53,8 @@ const handleUnfriend = async (friendId) => {
 </script>
 
 <template>
-    <div class="min-h-screen bg-gray-100 dark:bg-gray-900 pb-10">
-        <!-- Navbar -->
-        <nav class="bg-white dark:bg-gray-800 shadow sticky top-0 z-50">
-            <div class="container mx-auto px-4 h-16 flex justify-between items-center">
-                <h1 class="text-2xl font-bold text-blue-600 cursor-pointer" @click="router.push('/')">Facebook</h1>
-                <button @click="router.push('/')" class="text-gray-600 dark:text-gray-300 hover:text-blue-600 font-medium">Back to Feed</button>
-            </div>
-        </nav>
-
-        <div class="container mx-auto px-4 py-8 max-w-2xl">
+    <div class="min-h-screen bg-gray-100 dark:bg-gray-900 pt-16">
+        <div class="container mx-auto px-4 py-4 max-w-2xl">
             <h2 class="text-3xl font-bold mb-6 text-gray-800 dark:text-gray-100">Friends</h2>
 
             <!-- Add Friend Section -->
