@@ -45,7 +45,7 @@
                 @click="selectConversation(conv)"
                 :class="[
                   'p-4 border-b dark:border-gray-700 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700 transition',
-                  selectedPartnerId === conv.partnerId ? 'bg-blue-50' : ''
+                  selectedPartnerId === conv.partnerId ? 'bg-blue-50 dark:bg-blue-900' : ''
                 ]"
               >
                 <div class="flex items-center gap-3">
