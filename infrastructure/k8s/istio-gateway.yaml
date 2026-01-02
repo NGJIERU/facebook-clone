@@ -49,6 +49,40 @@ spec:
           number: 8082
   - match:
     - uri:
+        prefix: /api/media
+    route:
+    - destination:
+        host: media-service
+        port:
+          number: 8085
+  - match:
+    - uri:
+        prefix: /api/notifications
+    route:
+    - destination:
+        host: notification-service
+        port:
+          number: 8084
+  - match:
+    - uri:
+        prefix: /ws
+    route:
+    - destination:
+        host: notification-service
+        port:
+          number: 8084
+  - match:
+    - uri:
+        prefix: /media-bucket
+    route:
+    - destination:
+        host: minio-service
+        port:
+          number: 9000
+    rewrite:
+      uri: /media-bucket
+  - match:
+    - uri:
         prefix: /
     route:
     - destination:

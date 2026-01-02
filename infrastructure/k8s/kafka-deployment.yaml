@@ -18,6 +18,8 @@ spec:
         ports:
         - containerPort: 9092
         env:
+        - name: KAFKA_HEAP_OPTS
+          value: "-Xmx400M -Xms400M"
         - name: KAFKA_NODE_ID
           value: "1"
         - name: KAFKA_PROCESS_ROLES
@@ -59,6 +61,13 @@ spec:
           fi
           # Start Kafka
           /etc/confluent/docker/run
+        resources:
+          requests:
+            memory: "384Mi"
+            cpu: "100m"
+          limits:
+            memory: "768Mi"
+            cpu: "500m"
       volumes:
       - name: kafka-storage
         emptyDir: {}

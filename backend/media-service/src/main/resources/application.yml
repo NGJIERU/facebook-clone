@@ -33,11 +33,11 @@ spring:
 
 application:
   minio:
-    url: http://localhost:9000
-    public-url: http://localhost:9000
-    access-key: admin
-    secret-key: password
-    bucket: media-bucket
+    url: ${MINIO_URL:http://localhost:9000}
+    public-url: ${MINIO_PUBLIC_URL:http://localhost:9000}
+    access-key: ${MINIO_ACCESS_KEY:admin}
+    secret-key: ${MINIO_SECRET_KEY:password}
+    bucket: ${MINIO_BUCKET:media-bucket}
 
 logging:
   level:

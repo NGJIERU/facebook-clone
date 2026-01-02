@@ -51,6 +51,8 @@ build_frontend() {
 build_and_push "auth"
 build_and_push "user"
 build_and_push "feed"
+build_and_push "media"
+build_and_push "notification"
 build_frontend
 
 echo "✅ All images deployed successfully!"
