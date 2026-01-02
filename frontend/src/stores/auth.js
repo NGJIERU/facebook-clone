@@ -18,7 +18,7 @@ export const useAuthStore = defineStore('auth', {
                 this.token = token;
                 localStorage.setItem('token', token);
 
-                // Fetch full profile
+                // Fetch full profile from user-service
                 try {
                     const profileRes = await api.get('/users/profile');
                     this.user = profileRes.data;

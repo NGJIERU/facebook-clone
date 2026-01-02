@@ -19,7 +19,7 @@ export const useNotificationStore = defineStore('notification', () => {
         const userId = authStore.user?.id;
         // NotificationService sends to recipientId which is likely the email/username from the JWT.
         // authStore.user.username is set to email in auth.js login()
-        const recipientId = authStore.user?.username || authStore.user?.email;
+        const recipientId = authStore.user?.id;
 
         if (!recipientId) {
             console.error("Cannot connect to WebSocket: Missing user ID/email");

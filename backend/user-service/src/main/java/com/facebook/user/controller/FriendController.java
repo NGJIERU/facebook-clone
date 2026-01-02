@@ -19,59 +19,48 @@ public class FriendController {
 
     private final FriendService friendService;
 
-    @org.springframework.beans.factory.annotation.Value("${application.security.jwt.secret-key}")
-    private String secretKey;
-
-    private String extractUserIdFromToken(String token) {
-        if (token == null || !token.startsWith("Bearer ")) {
-            throw new RuntimeException("Invalid token format");
+    private String getCurrentUserId() {
+        org.springframework.security.core.Authentication authentication = org.springframework.security.core.context.SecurityContextHolder
+                .getContext().getAuthentication();
+        if (authentication == null || authentication.getPrincipal() == null) {
+            throw new RuntimeException("User not authenticated");
         }
-        String jwt = token.substring(7);
-        io.jsonwebtoken.Claims claims = io.jsonwebtoken.Jwts.parserBuilder()
-                .setSigningKey(io.jsonwebtoken.io.Decoders.BASE64.decode(secretKey))
-                .build()
-                .parseClaimsJws(jwt)
-                .getBody();
-        return claims.get("userId", String.class);
+        return authentication.getPrincipal().toString();
     }
 
     @PostMapping("/request/{addresseeId}")
     public ResponseEntity<Void> sendFriendRequest(
-            @PathVariable String addresseeId,
-            @RequestHeader("Authorization") String token) {
-        String userId = extractUserIdFromToken(token);
+            @PathVariable String addresseeId) {
+        String userId = getCurrentUserId();
         friendService.sendFriendRequest(userId, addresseeId);
         return ResponseEntity.ok().build();
     }
 
     @PutMapping("/accept/{friendshipId}")
     public ResponseEntity<Void> acceptFriendRequest(
-            @PathVariable UUID friendshipId,
-            @RequestHeader("Authorization") String token) {
-        String userId = extractUserIdFromToken(token);
+            @PathVariable UUID friendshipId) {
+        String userId = getCurrentUserId();
         friendService.acceptFriendRequest(friendshipId, userId);
         return ResponseEntity.ok().build();
     }
 
     @DeleteMapping("/reject/{friendshipId}")
     public ResponseEntity<Void> rejectFriendRequest(
-            @PathVariable UUID friendshipId,
-            @RequestHeader("Authorization") String token) {
-        String userId = extractUserIdFromToken(token);
+            @PathVariable UUID friendshipId) {
+        String userId = getCurrentUserId();
         friendService.rejectFriendRequest(friendshipId, userId);
         return ResponseEntity.ok().build();
     }
 
     @GetMapping
-    public ResponseEntity<List<UserProfile>> getFriends(@RequestHeader("Authorization") String token) {
-        String userId = extractUserIdFromToken(token);
+    public ResponseEntity<List<UserProfile>> getFriends() {
+        String userId = getCurrentUserId();
         return ResponseEntity.ok(friendService.getFriends(userId));
     }
 
     @GetMapping("/requests")
-    public ResponseEntity<List<com.facebook.user.dto.FriendRequestDto>> getPendingRequests(
-            @RequestHeader("Authorization") String token) {
-        String userId = extractUserIdFromToken(token);
+    public ResponseEntity<List<com.facebook.user.dto.FriendRequestDto>> getPendingRequests() {
+        String userId = getCurrentUserId();
         return ResponseEntity.ok(friendService.getPendingRequests(userId));
     }
 }

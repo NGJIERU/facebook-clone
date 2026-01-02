@@ -1,0 +1,51 @@
+# Fixes for Profile & Friend Endpoints
+
+## Issue 1: JWT userId Type Mismatch (Root Cause)
+**File:** backend/auth-service/src/main/java/com/facebook/auth/service/AuthService.java
+**Lines:** 38 and 53
+
+**Problem:** 
+The auth-service was storing `user.getId()` (a UUID object) directly in JWT claims. 
+The user-service tried to extract it as `String.class`, which returned null, 
+causing authentication to fail on protected endpoints.
+
+**Fix:**
+Changed `claims.put("userId", user.getId())` to `claims.put("userId", user.getId().toString())`
+in both the `register()` and `login()` methods.
+
+
+## Issue 2: Vite Proxy Configuration Conflict
+**File:** frontend/vite.config.js
+
+**Problem:**
+The `/api/user` proxy was matching `/api/users/*` requests and incorrectly rewriting paths.
+For example, `/api/users/profile` was being rewritten to `/s/profile` (404 error).
+
+**Fix:**
+Removed the `/api/user` proxy entry that was conflicting with `/api/users`.
+
+
+## Issue 3: Non-existent /auth/me Endpoint
+**File:** frontend/src/stores/auth.js
+**Line:** 23
+
+**Problem:**
+After login, the frontend called `/auth/me` to fetch the user profile, 
+but this endpoint doesn't exist in the auth-service.
+
+**Fix:**
+Changed `api.get('/auth/me')` to `api.get('/users/profile')` which exists in user-service.
+
+
+## Issue 4: WebSocket Connection Timing
+**File:** frontend/src/App.vue
+**Lines:** 17-22
+
+**Problem:**
+WebSocket tried to connect when `authStore.token` changed, but `authStore.user` 
+was still null at that point (profile fetch hadn't completed), causing 
+"Missing user ID/email" error.
+
+**Fix:**
+Changed the watch from `authStore.token` to `authStore.user` so WebSocket 
+connects only after the user profile is fetched and `user.id` is available.

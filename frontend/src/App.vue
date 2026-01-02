@@ -13,9 +13,9 @@ onMounted(() => {
   }
 });
 
-// Watch for login/logout
-watch(() => authStore.token, (newToken) => {
-  if (newToken) {
+// Watch for login/logout - watch user instead of token since user is set after profile fetch
+watch(() => authStore.user, (newUser) => {
+  if (newUser && newUser.id) {
     notificationStore.connect();
   } else {
     notificationStore.disconnect();

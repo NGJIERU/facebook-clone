@@ -11,23 +11,18 @@ export default defineConfig({
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/api\/auth/, ''),
       },
-      '/api/user': {
+      '/api/users': {
         target: 'http://localhost:8081',
         changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/api\/user/, ''),
-      },
-      '/api/feed': {
-        target: 'http://localhost:8082',
-        changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/api\/feed/, ''),
       },
       '/api/friends': {
         target: 'http://localhost:8081',
         changeOrigin: true,
       },
-      '/api/users': {
-        target: 'http://localhost:8081',
+      '/api/feed': {
+        target: 'http://localhost:8082',
         changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/api\/feed/, ''),
       },
       '/api/media': {
         target: 'http://localhost:8085',

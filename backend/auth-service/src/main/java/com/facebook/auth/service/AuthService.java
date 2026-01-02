@@ -35,7 +35,7 @@ public class AuthService {
                                 .build();
                 repository.save(user);
                 java.util.Map<String, Object> claims = new java.util.HashMap<>();
-                claims.put("userId", user.getId());
+                claims.put("userId", user.getId().toString());
                 var jwtToken = jwtService.generateToken(claims, user);
                 return AuthResponse.builder()
                                 .token(jwtToken)
@@ -50,7 +50,7 @@ public class AuthService {
                 var user = repository.findByEmail(request.getEmail())
                                 .orElseThrow();
                 java.util.Map<String, Object> claims = new java.util.HashMap<>();
-                claims.put("userId", user.getId());
+                claims.put("userId", user.getId().toString());
                 var jwtToken = jwtService.generateToken(claims, user);
                 return AuthResponse.builder()
                                 .token(jwtToken)

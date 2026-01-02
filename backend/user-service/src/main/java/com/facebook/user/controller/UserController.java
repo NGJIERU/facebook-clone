@@ -16,12 +16,18 @@ public class UserController {
 
     private final UserProfileRepository repository;
 
-    @org.springframework.beans.factory.annotation.Value("${application.security.jwt.secret-key}")
-    private String secretKey;
+    private String getCurrentUserId() {
+        org.springframework.security.core.Authentication authentication = org.springframework.security.core.context.SecurityContextHolder
+                .getContext().getAuthentication();
+        if (authentication == null || authentication.getPrincipal() == null) {
+            throw new RuntimeException("User not authenticated");
+        }
+        return authentication.getPrincipal().toString();
+    }
 
     @GetMapping("/profile")
-    public ResponseEntity<UserProfile> getMyProfile(@RequestHeader("Authorization") String token) {
-        String userId = extractUserIdFromToken(token);
+    public ResponseEntity<UserProfile> getMyProfile() {
+        String userId = getCurrentUserId();
         return repository.findById(UUID.fromString(userId))
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
@@ -47,10 +53,8 @@ public class UserController {
     }
 
     @PutMapping("/profile")
-    public ResponseEntity<UserProfile> updateProfile(
-            @RequestHeader("Authorization") String token,
-            @RequestBody UserProfile updatedProfile) {
-        String userId = extractUserIdFromToken(token);
+    public ResponseEntity<UserProfile> updateProfile(@RequestBody UserProfile updatedProfile) {
+        String userId = getCurrentUserId();
         return repository.findById(java.util.UUID.fromString(userId))
                 .map(profile -> {
                     profile.setUsername(updatedProfile.getUsername());
@@ -60,18 +64,5 @@ public class UserController {
                     return ResponseEntity.ok(repository.save(profile));
                 })
                 .orElse(ResponseEntity.notFound().build());
-    }
-
-    private String extractUserIdFromToken(String token) {
-        if (token == null || !token.startsWith("Bearer ")) {
-            throw new RuntimeException("Invalid token format");
-        }
-        String jwt = token.substring(7);
-        io.jsonwebtoken.Claims claims = io.jsonwebtoken.Jwts.parserBuilder()
-                .setSigningKey(io.jsonwebtoken.io.Decoders.BASE64.decode(secretKey))
-                .build()
-                .parseClaimsJws(jwt)
-                .getBody();
-        return claims.get("userId", String.class);
     }
 }
