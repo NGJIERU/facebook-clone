@@ -11,6 +11,7 @@ import NotificationDropdown from '../components/NotificationDropdown.vue';
 import LoadingSpinner from '../components/LoadingSpinner.vue';
 import StoriesBar from '../components/StoriesBar.vue';
 import ThemeToggle from '../components/ThemeToggle.vue';
+import GlobalSearch from '../components/GlobalSearch.vue';
 
 const authStore = useAuthStore();
 const friendStore = useFriendStore();
@@ -75,6 +76,8 @@ const handlePostShared = () => {
     <nav class="bg-white dark:bg-gray-800 shadow sticky top-0 z-50">
       <div class="container mx-auto px-4 h-16 flex justify-between items-center">
         <h1 class="text-2xl font-bold text-blue-600 cursor-pointer" @click="router.push('/')">Facebook</h1>
+        
+        <GlobalSearch />
         
         <div class="flex items-center gap-6">
           <button @click="router.push('/friends')" class="text-gray-600 dark:text-gray-300 hover:text-blue-600 font-medium">Friends</button>

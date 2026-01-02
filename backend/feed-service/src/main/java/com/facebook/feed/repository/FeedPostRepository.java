@@ -10,4 +10,6 @@ public interface FeedPostRepository extends JpaRepository<FeedPost, UUID> {
     List<FeedPost> findAllByOrderByCreatedAtDesc();
 
     List<FeedPost> findByAuthorIdOrderByCreatedAtDesc(String authorId);
+
+    List<FeedPost> findByContentContainingIgnoreCaseOrderByCreatedAtDesc(String content);
 }

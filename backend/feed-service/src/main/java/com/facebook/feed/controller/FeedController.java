@@ -175,6 +175,12 @@ public class FeedController {
         return org.springframework.http.ResponseEntity.ok(repository.findByAuthorIdOrderByCreatedAtDesc(userId));
     }
 
+    @org.springframework.web.bind.annotation.GetMapping("/api/feed/search")
+    public org.springframework.http.ResponseEntity<List<FeedPost>> searchPosts(
+            @org.springframework.web.bind.annotation.RequestParam String q) {
+        return org.springframework.http.ResponseEntity.ok(repository.findByContentContainingIgnoreCaseOrderByCreatedAtDesc(q));
+    }
+
     @org.springframework.web.bind.annotation.DeleteMapping("/api/feed/posts/{postId}")
     public org.springframework.http.ResponseEntity<?> deletePost(
             @org.springframework.web.bind.annotation.PathVariable java.util.UUID postId) {
