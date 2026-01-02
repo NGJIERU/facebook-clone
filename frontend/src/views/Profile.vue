@@ -1,68 +1,102 @@
 <template>
-  <div class="profile-container">
-    <!-- Profile Header -->
-    <div v-if="profile" class="profile-header">
-      <div class="cover-photo" :style="{ backgroundImage: profile.coverPicUrl ? `url(${profile.coverPicUrl})` : 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' }"></div>
-      
-      <div class="profile-info">
-        <div class="profile-picture">
-          <img :src="profile.profilePicUrl || '/default-avatar.png'" :alt="profile.username">
-        </div>
+  <div class="min-h-screen bg-gray-100">
+    <!-- Navbar -->
+    <nav class="bg-white shadow sticky top-0 z-50">
+      <div class="container mx-auto px-4 h-16 flex justify-between items-center">
+        <h1 class="text-2xl font-bold text-blue-600 cursor-pointer" @click="router.push('/')">Facebook</h1>
         
-        <div class="profile-details">
-          <h1>{{ profile.username }}</h1>
-          <p class="bio">{{ profile.bio || 'No bio yet' }}</p>
+        <div class="flex items-center gap-6">
+          <button @click="router.push('/')" class="text-gray-600 hover:text-blue-600 font-medium">Home</button>
+          <button @click="router.push('/friends')" class="text-gray-600 hover:text-blue-600 font-medium">Friends</button>
+          <button @click="handleLogout" class="text-gray-500 hover:text-red-600 transition font-medium text-sm">Logout</button>
         </div>
-        
-        <button v-if="isOwnProfile" @click="showEditModal = true" class="edit-button">
-          Edit Profile
-        </button>
       </div>
-    </div>
+    </nav>
 
-    <!-- Posts Feed -->
-    <div class="posts-section">
-      <h2>Posts</h2>
-      <div v-if="posts.length === 0" class="no-posts">
-        <p>{{ isOwnProfile ? 'You haven\'t posted anything yet' : 'No posts yet' }}</p>
+    <!-- Profile Content -->
+    <div class="profile-container">
+      <!-- Loading State -->
+      <div v-if="loading" class="text-center py-20">
+        <p class="text-gray-600">Loading profile...</p>
       </div>
-      <div v-else class="posts-list">
-        <div v-for="post in posts" :key="post.id" class="post-card">
-          <div class="post-header">
-            <img :src="profile.profilePicUrl || '/default-avatar.png'" :alt="profile.username" class="post-avatar">
-            <div>
-              <h3>{{ profile.username }}</h3>
-              <p class="post-time">{{ formatDate(post.createdAt) }}</p>
+
+      <!-- Error State -->
+      <div v-else-if="error" class=" bg-red-50 border border-red-200 rounded-lg p-6 my-8">
+        <p class="text-red-600">{{ error }}</p>
+        <button @click="router.push('/')" class="mt-4 px-4 py-2 bg-blue-600 text-white rounded">Go to Feed</button>
+      </div>
+
+      <!-- Profile Content -->
+      <div v-else>
+        <!-- Profile Header -->
+        <div v-if="profile" class="profile-header">
+          <div class="cover-photo" :style="{ backgroundImage: profile.coverPicUrl ? `url(${profile.coverPicUrl})` : 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' }"></div>
+          
+          <div class="profile-info">
+            <div class="profile-picture">
+              <div class="bg-blue-500 w-full h-full flex items-center justify-center text-white text-6xl font-bold">
+                {{ profile.username?.charAt(0).toUpperCase() }}
+              </div>
+            </div>
+            
+            <div class="profile-details">
+              <h1>{{ profile.username }}</h1>
+              <p class="bio">{{ profile.bio || 'No bio yet' }}</p>
+            </div>
+            
+            <button v-if="isOwnProfile" @click="showEditModal = true" class="edit-button">
+              Edit Profile
+            </button>
+          </div>
+        </div>
+
+        <!-- Posts Feed -->
+        <div class="posts-section">
+          <h2>Posts</h2>
+          <div v-if="posts.length === 0" class="no-posts">
+            <p>{{ isOwnProfile ? 'You haven\'t posted anything yet' : 'No posts yet' }}</p>
+          </div>
+          <div v-else class="posts-list">
+            <div v-for="post in posts" :key="post.id" class="post-card">
+              <div class="post-header">
+                <div class="post-avatar bg-blue-500 w-10 h-10 rounded-full flex items-center justify-center text-white font-bold">
+                  {{ profile.username?.charAt(0).toUpperCase() }}
+                </div>
+                <div>
+                  <h3>{{ profile.username }}</h3>
+                  <p class="post-time">{{ formatDate(post.createdAt) }}</p>
+                </div>
+              </div>
+              <p class="post-content">{{ post.content }}</p>
+              <img v-if="post.imageUrl" :src="post.imageUrl" :alt="'Post image'" class="post-image">
+              <div class="post-actions">
+                <span>👍 {{ post.likesCount }} Likes</span>
+                <span>💬 {{ post.commentsCount }} Comments</span>
+              </div>
             </div>
           </div>
-          <p class="post-content">{{ post.content }}</p>
-          <img v-if="post.imageUrl" :src="post.imageUrl" :alt="'Post image'" class="post-image">
-          <div class="post-actions">
-            <span>👍 {{ post.likesCount }} Likes</span>
-            <span>💬 {{ post.commentsCount }} Comments</span>
-          </div>
         </div>
       </div>
-    </div>
 
-    <!-- Edit Profile Modal -->
-    <div v-if="showEditModal" class="modal-overlay" @click="showEditModal = false">
-      <div class="modal-content" @click.stop>
-        <h2>Edit Profile</h2>
-        <form @submit.prevent="saveProfile">
-          <div class="form-group">
-            <label>Username</label>
-            <input v-model="editForm.username" type="text" required>
-          </div>
-          <div class="form-group">
-            <label>Bio</label>
-            <textarea v-model="editForm.bio" rows="4"></textarea>
-          </div>
-          <div class="form-actions">
-            <button type="button" @click="showEditModal = false" class="cancel-btn">Cancel</button>
-            <button type="submit" class="save-btn">Save Changes</button>
-          </div>
-        </form>
+      <!-- Edit Profile Modal -->
+      <div v-if="showEditModal" class="modal-overlay" @click="showEditModal = false">
+        <div class="modal-content" @click.stop>
+          <h2>Edit Profile</h2>
+          <form @submit.prevent="saveProfile">
+            <div class="form-group">
+              <label>Username</label>
+              <input v-model="editForm.username" type="text" required>
+            </div>
+            <div class="form-group">
+              <label>Bio</label>
+              <textarea v-model="editForm.bio" rows="4"></textarea>
+            </div>
+            <div class="form-actions">
+              <button type="button" @click="showEditModal = false" class="cancel-btn">Cancel</button>
+              <button type="submit" class="save-btn">Save Changes</button>
+            </div>
+          </form>
+        </div>
       </div>
     </div>
   </div>
@@ -70,15 +104,18 @@
 
 <script setup>
 import { ref, computed, onMounted } from 'vue';
-import { useRoute } from 'vue-router';
+import { useRoute, useRouter } from 'vue-router';
 import { useAuthStore } from '../stores/auth';
 import api from '../utils/api';
 
 const route = useRoute();
+const router = useRouter();
 const authStore = useAuthStore();
 
 const profile = ref(null);
 const posts = ref([]);
+const loading = ref(true);
+const error = ref(null);
 const showEditModal = ref(false);
 const editForm = ref({
   username: '',
@@ -91,29 +128,64 @@ const isOwnProfile = computed(() => {
 
 const fetchProfile = async () => {
   try {
-    const userId = route.params.userId || authStore.user?.id;
-    if (!userId) return;
+    loading.value = true;
+    error.value = null;
     
+    // Get userId from route or auth store
+    let userId = route.params.userId;
+    
+    // If no userId in route, use current user
+    if (!userId) {
+      // Try to get from auth store
+      if (authStore.user?.id) {
+        userId = authStore.user.id;
+      } else {
+        // Fetch current user profile
+        console.log('Fetching current user profile from /users/profile');
+        const response = await api.get('/users/profile');
+        profile.value = response.data;
+        editForm.value = {
+          username: response.data.username,
+          bio: response.data.bio || ''
+        };
+        loading.value = false;
+        return;
+      }
+    }
+    
+    console.log('Fetching profile for userId:', userId);
     const response = await api.get(`/users/profile/${userId}`);
     profile.value = response.data;
     editForm.value = {
       username: response.data.username,
       bio: response.data.bio || ''
     };
-  } catch (error) {
-    console.error('Failed to fetch profile:', error);
+  } catch (err) {
+    console.error('Failed to fetch profile:', err);
+    error.value = err.response?.data?.message || 'Failed to load profile. Please try again.';
+  } finally{
+    loading.value = false;
   }
 };
 
 const fetchPosts = async () => {
   try {
-    const userId = route.params.userId || authStore.user?.id;
-    if (!userId) return;
+    let userId = route.params.userId;
     
+    if (!userId) {
+      userId = authStore.user?.id || profile.value?.id;
+    }
+    
+    if (!userId) {
+      console.log('No userId available for fetching posts');
+      return;
+    }
+    
+    console.log('Fetching posts for userId:', userId);
     const response = await api.get(`/feed/user/${userId}`);
     posts.value = response.data;
-  } catch (error) {
-    console.error('Failed to fetch posts:', error);
+  } catch (err) {
+    console.error('Failed to fetch posts:', err);
   }
 };
 
@@ -123,10 +195,15 @@ const saveProfile = async () => {
     profile.value = response.data;
     authStore.user = response.data; // Update auth store
     showEditModal.value = false;
-  } catch (error) {
-    console.error('Failed to update profile:', error);
+  } catch (err) {
+    console.error('Failed to update profile:', err);
     alert('Failed to update profile');
   }
+};
+
+const handleLogout = () => {
+  authStore.logout();
+  router.push('/login');
 };
 
 const formatDate = (dateString) => {
@@ -144,9 +221,9 @@ const formatDate = (dateString) => {
   return date.toLocaleDateString();
 };
 
-onMounted(() => {
-  fetchProfile();
-  fetchPosts();
+onMounted(async () => {
+  await fetchProfile();
+  await fetchPosts();
 });
 </script>
 
