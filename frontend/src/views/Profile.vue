@@ -32,7 +32,7 @@
       <!-- Profile Content -->
       <div v-else>
         <!-- Profile Header -->
-        <div v-if="profile" class="profile-header">
+        <div v-if="profile" class="profile-header dark:bg-gray-800">
           <div class="cover-photo" :style="{ backgroundImage: profile.coverPicUrl ? `url(${profile.coverPicUrl})` : 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' }"></div>
           
           <div class="profile-info">
@@ -48,8 +48,8 @@
             </div>
             
             <div class="profile-details">
-              <h1>{{ profile.username }}</h1>
-              <p class="bio">{{ profile.bio || 'No bio yet' }}</p>
+              <h1 class="dark:text-white">{{ profile.username }}</h1>
+              <p class="bio dark:text-gray-400">{{ profile.bio || 'No bio yet' }}</p>
             </div>
             
             <button v-if="isOwnProfile" @click="showEditModal = true" class="edit-button">
@@ -62,22 +62,22 @@
         </div>
 
         <!-- Settings Section for own profile -->
-        <div v-if="isOwnProfile" class="settings-section">
-          <h3>Quick Settings</h3>
+        <div v-if="isOwnProfile" class="settings-section dark:bg-gray-800">
+          <h3 class="dark:text-white">Quick Settings</h3>
           <div class="settings-grid">
-            <div class="setting-item" @click="router.push('/saved')">
+            <div class="setting-item dark:bg-gray-700 dark:text-gray-200" @click="router.push('/saved')">
               <span class="setting-icon">🔖</span>
               <span>Saved Posts</span>
             </div>
-            <div class="setting-item" @click="router.push('/friends')">
+            <div class="setting-item dark:bg-gray-700 dark:text-gray-200" @click="router.push('/friends')">
               <span class="setting-icon">👥</span>
               <span>Friends</span>
             </div>
-            <div class="setting-item" @click="router.push('/groups')">
+            <div class="setting-item dark:bg-gray-700 dark:text-gray-200" @click="router.push('/groups')">
               <span class="setting-icon">👨‍👩‍👧‍👦</span>
               <span>Groups</span>
             </div>
-            <div class="setting-item" @click="router.push('/events')">
+            <div class="setting-item dark:bg-gray-700 dark:text-gray-200" @click="router.push('/events')">
               <span class="setting-icon">📅</span>
               <span>Events</span>
             </div>
@@ -85,26 +85,26 @@
         </div>
 
         <!-- Posts Feed -->
-        <div class="posts-section">
-          <h2>Posts</h2>
-          <div v-if="posts.length === 0" class="no-posts">
+        <div class="posts-section dark:bg-gray-800">
+          <h2 class="dark:text-white">Posts</h2>
+          <div v-if="posts.length === 0" class="no-posts dark:text-gray-400">
             <p>{{ isOwnProfile ? 'You haven\'t posted anything yet' : 'No posts yet' }}</p>
           </div>
           <div v-else class="posts-list">
-            <div v-for="post in posts" :key="post.id" class="post-card">
+            <div v-for="post in posts" :key="post.id" class="post-card dark:bg-gray-700 dark:border-gray-600">
               <div class="post-header">
                 <div class="post-avatar w-10 h-10 rounded-full overflow-hidden flex items-center justify-center text-white font-bold" :class="{ 'bg-blue-500': !profile.profilePicUrl }">
                   <img v-if="profile.profilePicUrl" :src="profile.profilePicUrl" class="w-full h-full object-cover" />
                   <span v-else>{{ profile.username?.charAt(0).toUpperCase() }}</span>
                 </div>
                 <div>
-                  <h3>{{ profile.username }}</h3>
-                  <p class="post-time">{{ formatDate(post.createdAt) }}</p>
+                  <h3 class="dark:text-white">{{ profile.username }}</h3>
+                  <p class="post-time dark:text-gray-400">{{ formatDate(post.createdAt) }}</p>
                 </div>
               </div>
-              <p class="post-content">{{ post.content }}</p>
+              <p class="post-content dark:text-gray-200">{{ post.content }}</p>
               <img v-if="post.imageUrl" :src="post.imageUrl" :alt="'Post image'" class="post-image">
-              <div class="post-actions">
+              <div class="post-actions dark:border-gray-600 dark:text-gray-400">
                 <span>👍 {{ post.likesCount }} Likes</span>
                 <span>💬 {{ post.commentsCount }} Comments</span>
               </div>
@@ -115,12 +115,12 @@
 
       <!-- Edit Profile Modal -->
       <div v-if="showEditModal" class="modal-overlay" @click="showEditModal = false">
-        <div class="modal-content" @click.stop>
-          <h2>Edit Profile</h2>
+        <div class="modal-content dark:bg-gray-800" @click.stop>
+          <h2 class="dark:text-white">Edit Profile</h2>
           <form @submit.prevent="saveProfile">
             <!-- Profile Picture -->
             <div class="form-group">
-              <label>Profile Picture</label>
+              <label class="dark:text-gray-200">Profile Picture</label>
               <div class="flex items-center gap-4">
                 <div class="w-16 h-16 rounded-full overflow-hidden bg-blue-500 flex items-center justify-center">
                   <img v-if="editForm.profilePicUrl" :src="editForm.profilePicUrl" class="w-full h-full object-cover" />
@@ -134,7 +134,7 @@
             </div>
             <!-- Cover Picture -->
             <div class="form-group">
-              <label>Cover Photo</label>
+              <label class="dark:text-gray-200">Cover Photo</label>
               <div class="w-full h-20 rounded overflow-hidden bg-gradient-to-r from-blue-500 to-purple-500">
                 <img v-if="editForm.coverPicUrl" :src="editForm.coverPicUrl" class="w-full h-full object-cover" />
               </div>
@@ -144,15 +144,15 @@
               </button>
             </div>
             <div class="form-group">
-              <label>Username</label>
-              <input v-model="editForm.username" type="text" required>
+              <label class="dark:text-gray-200">Username</label>
+              <input v-model="editForm.username" type="text" required class="dark:bg-gray-700 dark:border-gray-600 dark:text-white">
             </div>
             <div class="form-group">
-              <label>Bio</label>
-              <textarea v-model="editForm.bio" rows="4"></textarea>
+              <label class="dark:text-gray-200">Bio</label>
+              <textarea v-model="editForm.bio" rows="4" class="dark:bg-gray-700 dark:border-gray-600 dark:text-white"></textarea>
             </div>
             <div class="form-actions">
-              <button type="button" @click="showEditModal = false" class="cancel-btn">Cancel</button>
+              <button type="button" @click="showEditModal = false" class="cancel-btn dark:bg-gray-600 dark:text-white">Cancel</button>
               <button type="submit" class="save-btn">Save Changes</button>
             </div>
           </form>
@@ -161,44 +161,44 @@
 
       <!-- Settings Modal -->
       <div v-if="showSettingsModal" class="modal-overlay" @click="showSettingsModal = false">
-        <div class="modal-content settings-modal" @click.stop>
-          <h2>Settings</h2>
+        <div class="modal-content settings-modal dark:bg-gray-800" @click.stop>
+          <h2 class="dark:text-white">Settings</h2>
           
           <div class="settings-list">
             <div class="settings-category">
-              <h4>Account</h4>
-              <div class="setting-row" @click="showEditModal = true; showSettingsModal = false">
+              <h4 class="dark:text-gray-400">Account</h4>
+              <div class="setting-row dark:bg-gray-700 dark:text-gray-200" @click="showEditModal = true; showSettingsModal = false">
                 <span>✏️ Edit Profile</span>
                 <span class="arrow">›</span>
               </div>
-              <div class="setting-row" @click="router.push('/saved'); showSettingsModal = false">
+              <div class="setting-row dark:bg-gray-700 dark:text-gray-200" @click="router.push('/saved'); showSettingsModal = false">
                 <span>🔖 Saved Posts</span>
                 <span class="arrow">›</span>
               </div>
             </div>
             
             <div class="settings-category">
-              <h4>Privacy</h4>
-              <div class="setting-row">
+              <h4 class="dark:text-gray-400">Privacy</h4>
+              <div class="setting-row dark:bg-gray-700 dark:text-gray-200">
                 <span>🔒 Profile Visibility</span>
                 <span class="setting-value">Public</span>
               </div>
-              <div class="setting-row">
+              <div class="setting-row dark:bg-gray-700 dark:text-gray-200">
                 <span>👁️ Who can see my posts</span>
                 <span class="setting-value">Everyone</span>
               </div>
             </div>
             
             <div class="settings-category">
-              <h4>Notifications</h4>
-              <div class="setting-row">
+              <h4 class="dark:text-gray-400">Notifications</h4>
+              <div class="setting-row dark:bg-gray-700 dark:text-gray-200">
                 <span>🔔 Push Notifications</span>
                 <label class="toggle">
                   <input type="checkbox" checked>
                   <span class="slider"></span>
                 </label>
               </div>
-              <div class="setting-row">
+              <div class="setting-row dark:bg-gray-700 dark:text-gray-200">
                 <span>📧 Email Notifications</span>
                 <label class="toggle">
                   <input type="checkbox">
@@ -208,8 +208,8 @@
             </div>
             
             <div class="settings-category danger">
-              <h4>Danger Zone</h4>
-              <div class="setting-row danger" @click="handleLogout">
+              <h4 class="dark:text-red-400">Danger Zone</h4>
+              <div class="setting-row danger dark:bg-gray-700" @click="handleLogout">
                 <span>🚪 Logout</span>
                 <span class="arrow">›</span>
               </div>
@@ -217,7 +217,7 @@
           </div>
           
           <div class="form-actions">
-            <button type="button" @click="showSettingsModal = false" class="cancel-btn">Close</button>
+            <button type="button" @click="showSettingsModal = false" class="cancel-btn dark:bg-gray-600 dark:text-white">Close</button>
           </div>
         </div>
       </div>
@@ -229,7 +229,11 @@
 import { ref, computed, onMounted } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { useAuthStore } from '../stores/auth';
+import { useThemeStore } from '../stores/theme';
 import api from '../utils/api';
+
+// Initialize theme store to ensure dark mode is applied
+const themeStore = useThemeStore();
 
 const route = useRoute();
 const router = useRouter();
