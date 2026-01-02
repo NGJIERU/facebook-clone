@@ -63,11 +63,11 @@ spec:
           /etc/confluent/docker/run
         resources:
           requests:
-            memory: "384Mi"
-            cpu: "100m"
+            memory: "512Mi"
+            cpu: "250m"
           limits:
-            memory: "768Mi"
-            cpu: "500m"
+            memory: "1Gi"
+            cpu: "1000m"
       volumes:
       - name: kafka-storage
         emptyDir: {}

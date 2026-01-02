@@ -37,6 +37,13 @@ spec:
               key: secret-key
         - name: SPRING_KAFKA_BOOTSTRAP_SERVERS
           value: kafka:9092
+        resources:
+          requests:
+            memory: "128Mi"
+            cpu: "50m"
+          limits:
+            memory: "512Mi"
+            cpu: "250m"
         livenessProbe:
           httpGet:
             path: /api/feed/actuator/health

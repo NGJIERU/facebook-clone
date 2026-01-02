@@ -57,8 +57,8 @@ spec:
               value: "" # Empty to force relative path generation (e.g. /media-bucket/filename)
           resources:
             requests:
-              memory: "256Mi"
-              cpu: "100m"
+              memory: "128Mi"
+              cpu: "50m"
             limits:
               memory: "512Mi"
               cpu: "300m"

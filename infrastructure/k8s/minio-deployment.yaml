@@ -72,9 +72,16 @@ spec:
             initialDelaySeconds: 60
             periodSeconds: 20
       volumes:
-        - name: data
-          persistentVolumeClaim:
-            claimName: minio-pvc
+      - name: data
+        emptyDir: {}
+      - name: minio-user
+        projected:
+          sources:
+          - secret:
+              name: minio-secret
+#      - name: data
+#        persistentVolumeClaim:
+#          claimName: minio-pvc
 ---
 apiVersion: v1
 kind: Service
