@@ -33,10 +33,15 @@
           <div class="cover-photo" :style="{ backgroundImage: profile.coverPicUrl ? `url(${profile.coverPicUrl})` : 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' }"></div>
           
           <div class="profile-info">
-            <div class="profile-picture">
-              <div class="bg-blue-500 w-full h-full flex items-center justify-center text-white text-6xl font-bold">
+            <div class="profile-picture" @click="isOwnProfile && triggerProfilePicUpload()">
+              <img v-if="profile.profilePicUrl" :src="profile.profilePicUrl" class="w-full h-full object-cover" />
+              <div v-else class="bg-blue-500 w-full h-full flex items-center justify-center text-white text-6xl font-bold">
                 {{ profile.username?.charAt(0).toUpperCase() }}
               </div>
+              <div v-if="isOwnProfile" class="profile-pic-overlay">
+                <span>📷</span>
+              </div>
+              <input type="file" ref="profilePicInput" @change="uploadProfilePic" accept="image/*" class="hidden" />
             </div>
             
             <div class="profile-details">
@@ -59,8 +64,9 @@
           <div v-else class="posts-list">
             <div v-for="post in posts" :key="post.id" class="post-card">
               <div class="post-header">
-                <div class="post-avatar bg-blue-500 w-10 h-10 rounded-full flex items-center justify-center text-white font-bold">
-                  {{ profile.username?.charAt(0).toUpperCase() }}
+                <div class="post-avatar w-10 h-10 rounded-full overflow-hidden flex items-center justify-center text-white font-bold" :class="{ 'bg-blue-500': !profile.profilePicUrl }">
+                  <img v-if="profile.profilePicUrl" :src="profile.profilePicUrl" class="w-full h-full object-cover" />
+                  <span v-else>{{ profile.username?.charAt(0).toUpperCase() }}</span>
                 </div>
                 <div>
                   <h3>{{ profile.username }}</h3>
@@ -121,6 +127,8 @@ const editForm = ref({
   username: '',
   bio: ''
 });
+const profilePicInput = ref(null);
+const uploadingPic = ref(false);
 
 const isOwnProfile = computed(() => {
   return profile.value && authStore.user && profile.value.id === authStore.user.id;
@@ -221,6 +229,42 @@ const formatDate = (dateString) => {
   return date.toLocaleDateString();
 };
 
+const triggerProfilePicUpload = () => {
+  profilePicInput.value?.click();
+};
+
+const uploadProfilePic = async (event) => {
+  const file = event.target.files[0];
+  if (!file) return;
+  
+  uploadingPic.value = true;
+  try {
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('userId', authStore.user.id);
+    
+    const uploadRes = await api.post('/media/upload', formData, {
+      headers: { 'Content-Type': 'multipart/form-data' }
+    });
+    
+    const imageUrl = uploadRes.data.url;
+    
+    // Update profile with new picture URL
+    const updateRes = await api.put('/users/profile', {
+      ...editForm.value,
+      profilePicUrl: imageUrl
+    });
+    
+    profile.value = updateRes.data;
+    authStore.user = updateRes.data;
+  } catch (err) {
+    console.error('Failed to upload profile picture:', err);
+    alert('Failed to upload profile picture');
+  } finally {
+    uploadingPic.value = false;
+  }
+};
+
 onMounted(async () => {
   await fetchProfile();
   await fetchPosts();
@@ -268,6 +312,24 @@ onMounted(async () => {
   width: 100%;
   height: 100%;
   object-fit: cover;
+}
+
+.profile-pic-overlay {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: rgba(0, 0, 0, 0.5);
+  color: white;
+  text-align: center;
+  padding: 8px;
+  opacity: 0;
+  transition: opacity 0.2s;
+  cursor: pointer;
+}
+
+.profile-picture:hover .profile-pic-overlay {
+  opacity: 1;
 }
 
 .profile-details {

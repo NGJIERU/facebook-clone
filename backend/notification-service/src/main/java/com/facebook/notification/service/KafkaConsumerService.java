@@ -40,4 +40,39 @@ public class KafkaConsumerService {
             log.error("Error processing Kafka event", e);
         }
     }
+
+    @KafkaListener(topics = "notification-topic", groupId = "notification-group")
+    public void consumeNotification(String eventJson) {
+        try {
+            log.info("Received notification event: {}", eventJson);
+            var node = objectMapper.readTree(eventJson);
+            
+            String type = node.get("type").asText();
+            String recipientId = node.get("recipientId").asText();
+            String senderId = node.get("senderId").asText();
+            String message = node.get("message").asText();
+            String postId = node.has("postId") ? node.get("postId").asText() : null;
+
+            NotificationType notificationType = switch (type) {
+                case "LIKE" -> NotificationType.LIKE;
+                case "COMMENT" -> NotificationType.COMMENT;
+                case "FRIEND_REQUEST" -> NotificationType.FRIEND_REQUEST;
+                default -> NotificationType.POST_CREATED;
+            };
+
+            Notification notification = Notification.builder()
+                    .recipientId(recipientId)
+                    .senderId(senderId)
+                    .type(notificationType)
+                    .message(message)
+                    .resourceId(postId)
+                    .isRead(false)
+                    .build();
+
+            notificationService.saveAndSend(notification);
+
+        } catch (Exception e) {
+            log.error("Error processing notification event", e);
+        }
+    }
 }

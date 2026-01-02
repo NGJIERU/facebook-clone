@@ -15,6 +15,7 @@ import java.util.UUID;
 public class UserController {
 
     private final UserProfileRepository repository;
+    private final com.facebook.user.security.JwtService jwtService;
 
     private String getCurrentUserId() {
         org.springframework.security.core.Authentication authentication = org.springframework.security.core.context.SecurityContextHolder
@@ -25,12 +26,36 @@ public class UserController {
         return authentication.getPrincipal().toString();
     }
 
+    private String getTokenFromContext() {
+        jakarta.servlet.http.HttpServletRequest request = ((org.springframework.web.context.request.ServletRequestAttributes) 
+            org.springframework.web.context.request.RequestContextHolder.getRequestAttributes()).getRequest();
+        String authHeader = request.getHeader("Authorization");
+        if (authHeader != null && authHeader.startsWith("Bearer ")) {
+            return authHeader.substring(7);
+        }
+        return null;
+    }
+
     @GetMapping("/profile")
     public ResponseEntity<UserProfile> getMyProfile() {
         String userId = getCurrentUserId();
         return repository.findById(UUID.fromString(userId))
                 .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+                .orElseGet(() -> {
+                    // Auto-create profile for new users
+                    String token = getTokenFromContext();
+                    if (token != null) {
+                        String email = jwtService.extractUsername(token);
+                        String username = email.contains("@") ? email.substring(0, email.indexOf("@")) : email;
+                        UserProfile newProfile = UserProfile.builder()
+                                .id(UUID.fromString(userId))
+                                .username(username)
+                                .bio("")
+                                .build();
+                        return ResponseEntity.ok(repository.save(newProfile));
+                    }
+                    return ResponseEntity.notFound().build();
+                });
     }
 
     @GetMapping("/{id}")

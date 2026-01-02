@@ -1,11 +1,13 @@
 <script setup>
-import { ref, onMounted, onUnmounted } from 'vue';
+import { ref, onMounted, onUnmounted, watch } from 'vue';
 import { useNotificationStore } from '../stores/notification';
 import { formatDistanceToNow } from 'date-fns';
+import api from '../utils/api';
 
 const notificationStore = useNotificationStore();
 const isOpen = ref(false);
 const dropdownRef = ref(null);
+const senderNames = ref({});
 
 const toggleDropdown = () => {
   isOpen.value = !isOpen.value;
@@ -22,6 +24,30 @@ const handleClickOutside = (event) => {
     isOpen.value = false;
   }
 };
+
+const fetchSenderName = async (senderId) => {
+  if (senderId === 'SYSTEM' || senderNames.value[senderId]) return;
+  try {
+    const response = await api.get(`/users/profile/${senderId}`);
+    senderNames.value[senderId] = response.data.username;
+  } catch (e) {
+    senderNames.value[senderId] = senderId; // fallback to ID
+  }
+};
+
+const getSenderDisplayName = (senderId) => {
+  if (senderId === 'SYSTEM') return 'SYSTEM';
+  return senderNames.value[senderId] || senderId;
+};
+
+// Watch for new notifications and fetch sender names
+watch(() => notificationStore.history, async (notifications) => {
+  for (const notification of notifications) {
+    if (notification.senderId && notification.senderId !== 'SYSTEM') {
+      await fetchSenderName(notification.senderId);
+    }
+  }
+}, { immediate: true, deep: true });
 
 onMounted(() => {
   document.addEventListener('click', handleClickOutside);
@@ -86,7 +112,7 @@ const formatDate = (dateString) => {
                 </div>
                 <div class="flex-1">
                      <p class="text-sm text-gray-800" :class="{ 'font-semibold': !notification.read }">
-                        <span class="font-bold">{{ notification.senderId }}</span> {{ notification.message }}
+                        <span class="font-bold">{{ getSenderDisplayName(notification.senderId) }}</span> {{ notification.message }}
                      </p>
                      <p class="text-xs text-gray-500 mt-1">
                         {{ formatDate(notification.createdAt) }}
