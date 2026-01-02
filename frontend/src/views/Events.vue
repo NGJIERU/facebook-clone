@@ -124,8 +124,9 @@
         <div class="mt-6 flex justify-end gap-2">
           <button @click="showCreateModal = false" class="px-4 py-2 text-gray-600 hover:bg-gray-100 rounded">Cancel</button>
           <button 
+            type="button"
             @click="createEvent"
-            :disabled="creating || !newEvent.title.trim() || !newEvent.eventDate"
+            :disabled="creating || !newEvent.title || !newEvent.title.trim() || !newEvent.eventDate"
             class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 disabled:opacity-50"
           >
             {{ creating ? 'Creating...' : 'Create Event' }}
@@ -257,21 +258,27 @@ const displayedEvents = computed(() => {
 });
 
 const createEvent = async () => {
-  if (!newEvent.value.title.trim() || !newEvent.value.eventDate) return;
+  console.log('createEvent called', newEvent.value);
+  if (!newEvent.value.title.trim() || !newEvent.value.eventDate) {
+    console.log('Validation failed - title or date missing');
+    return;
+  }
   
   creating.value = true;
   try {
     const eventDate = new Date(newEvent.value.eventDate).toISOString();
+    console.log('Sending request to create event', { ...newEvent.value, eventDate });
     await api.post('/events', {
       ...newEvent.value,
       eventDate
     });
+    console.log('Event created successfully');
     showCreateModal.value = false;
     newEvent.value = { title: '', description: '', location: '', eventDate: '' };
     await fetchEvents();
   } catch (e) {
     console.error('Failed to create event', e);
-    alert('Failed to create event');
+    alert('Failed to create event: ' + (e.response?.data || e.message));
   } finally {
     creating.value = false;
   }
@@ -289,20 +296,21 @@ const viewEvent = async (event) => {
 
 const rsvp = async (status) => {
   if (!selectedEvent.value) return;
+  // Don't do anything if clicking the same status
+  if (currentRsvpStatus.value === status) return;
+  
+  const previousStatus = currentRsvpStatus.value;
   rsvping.value = true;
   try {
     await api.post(`/events/${selectedEvent.value.id}/rsvp`, { status });
+    
+    // Update counts locally based on previous and new status
+    if (previousStatus === 'GOING') selectedEvent.value.attendeesCount--;
+    if (previousStatus === 'INTERESTED') selectedEvent.value.interestedCount--;
+    if (status === 'GOING') selectedEvent.value.attendeesCount++;
+    if (status === 'INTERESTED') selectedEvent.value.interestedCount++;
+    
     currentRsvpStatus.value = status;
-    
-    // Update counts locally
-    if (status === 'GOING') {
-      selectedEvent.value.attendeesCount++;
-      if (currentRsvpStatus.value === 'INTERESTED') selectedEvent.value.interestedCount--;
-    } else if (status === 'INTERESTED') {
-      selectedEvent.value.interestedCount++;
-      if (currentRsvpStatus.value === 'GOING') selectedEvent.value.attendeesCount--;
-    }
-    
     await fetchMyEvents();
   } catch (e) {
     console.error('Failed to RSVP', e);

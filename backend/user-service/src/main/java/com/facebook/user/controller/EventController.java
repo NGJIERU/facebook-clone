@@ -164,9 +164,9 @@ public class EventController {
     public ResponseEntity<?> getRsvpStatus(@PathVariable UUID eventId) {
         String currentUserId = getCurrentUserId();
         var rsvp = rsvpRepository.findByEventIdAndUserId(eventId, currentUserId);
-        return ResponseEntity.ok(Map.of(
-                "hasRsvp", rsvp.isPresent(),
-                "status", rsvp.map(EventRsvp::getStatus).orElse(null)
-        ));
+        java.util.HashMap<String, Object> response = new java.util.HashMap<>();
+        response.put("hasRsvp", rsvp.isPresent());
+        response.put("status", rsvp.map(EventRsvp::getStatus).orElse(null));
+        return ResponseEntity.ok(response);
     }
 }

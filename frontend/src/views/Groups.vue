@@ -119,8 +119,9 @@
         <div class="mt-6 flex justify-end gap-2">
           <button @click="showCreateModal = false" class="px-4 py-2 text-gray-600 hover:bg-gray-100 rounded">Cancel</button>
           <button 
+            type="button"
             @click="createGroup"
-            :disabled="creating || !newGroup.name.trim()"
+            :disabled="creating || !newGroup.name || !newGroup.name.trim()"
             class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 disabled:opacity-50"
           >
             {{ creating ? 'Creating...' : 'Create Group' }}
@@ -253,18 +254,24 @@ const handleSearch = async () => {
 };
 
 const createGroup = async () => {
-  if (!newGroup.value.name.trim()) return;
+  console.log('createGroup called', newGroup.value);
+  if (!newGroup.value.name.trim()) {
+    console.log('Name is empty, returning');
+    return;
+  }
   
   creating.value = true;
   try {
+    console.log('Sending request to create group');
     await api.post('/groups', newGroup.value);
+    console.log('Group created successfully');
     showCreateModal.value = false;
     newGroup.value = { name: '', description: '', isPublic: true };
     await fetchGroups();
     await fetchMyGroups();
   } catch (e) {
     console.error('Failed to create group', e);
-    alert('Failed to create group');
+    alert('Failed to create group: ' + (e.response?.data || e.message));
   } finally {
     creating.value = false;
   }
