@@ -62,7 +62,7 @@ const props = defineProps({
   },
   imageUrl: {
     type: String,
-    required: true
+    default: ''
   },
   alt: {
     type: String,

@@ -52,13 +52,21 @@ const handleSubmit = async () => {
         uploading.value = true;
 
         if (selectedFile.value) {
-            // Assume user ID is available in auth store. Using '1' as fallback if not.
-            // In a real app, we should ensure we have the ID.
-            const userId = authStore.user?.id || 1; 
-            const response = await uploadMedia(selectedFile.value, userId);
-            imageUrl = response.data.url;
+            const userId = authStore.user?.id || '1'; 
+            console.log('Uploading file for user:', userId);
+            try {
+                const response = await uploadMedia(selectedFile.value, userId);
+                console.log('Upload response:', response);
+                imageUrl = response.data.url;
+            } catch (uploadError) {
+                console.error('Media upload failed:', uploadError);
+                alert('Failed to upload image. Please try again.');
+                uploading.value = false;
+                return;
+            }
         }
 
+        console.log('Creating post with imageUrl:', imageUrl);
         await createPost({
             content: content.value,
             imageUrl: imageUrl
@@ -69,6 +77,7 @@ const handleSubmit = async () => {
         emit('post-created');
     } catch (e) {
         console.error("Failed to create post:", e);
+        alert('Failed to create post. Please try again.');
     } finally {
         uploading.value = false;
     }
