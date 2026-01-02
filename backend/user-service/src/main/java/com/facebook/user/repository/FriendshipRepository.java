@@ -26,4 +26,9 @@ public interface FriendshipRepository extends JpaRepository<Friendship, UUID> {
             "WHERE (f.requesterId = :user1Id AND f.addresseeId = :user2Id) " +
             "OR (f.requesterId = :user2Id AND f.addresseeId = :user1Id)")
     boolean existsBetween(String user1Id, String user2Id);
+
+    // Find accepted friendship between two users
+    @Query("SELECT f FROM Friendship f WHERE ((f.requesterId = :user1Id AND f.addresseeId = :user2Id) " +
+            "OR (f.requesterId = :user2Id AND f.addresseeId = :user1Id)) AND f.status = 'ACCEPTED'")
+    Optional<Friendship> findAcceptedBetween(String user1Id, String user2Id);
 }

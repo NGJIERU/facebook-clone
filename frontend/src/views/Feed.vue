@@ -55,6 +55,10 @@ const handleLogout = () => {
 const handlePostCreated = () => {
     refetch();
 };
+
+const handlePostDeleted = () => {
+    refetch();
+};
 </script>
 
 <template>
@@ -69,8 +73,9 @@ const handlePostCreated = () => {
           <NotificationDropdown />
           
           <div class="flex items-center gap-2 cursor-pointer" @click="router.push('/profile')">
-              <div class="bg-blue-100 w-8 h-8 rounded-full flex items-center justify-center text-blue-600 font-bold text-sm">
-                  {{ authStore.user?.username?.charAt(0).toUpperCase() }}
+              <div class="bg-blue-100 w-8 h-8 rounded-full overflow-hidden flex items-center justify-center text-blue-600 font-bold text-sm">
+                  <img v-if="authStore.user?.profilePicUrl" :src="authStore.user.profilePicUrl" class="w-full h-full object-cover" />
+                  <span v-else>{{ authStore.user?.username?.charAt(0).toUpperCase() }}</span>
               </div>
               <span class="font-medium text-gray-700 hidden sm:block">{{ authStore.user?.username }}</span>
           </div>
@@ -120,7 +125,7 @@ const handlePostCreated = () => {
         </div>
 
         <div v-else class="feed-stream">
-            <PostCard v-for="post in posts" :key="post.id" :post="post" />
+            <PostCard v-for="post in posts" :key="post.id" :post="post" @post-deleted="handlePostDeleted" />
         </div>
       </div>
     </main>

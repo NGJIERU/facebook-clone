@@ -75,6 +75,17 @@ export const useFriendStore = defineStore('friend', {
                 console.error('Search failed', err);
                 return [];
             }
+        },
+
+        async unfriend(friendId) {
+            try {
+                await api.delete(`/friends/${friendId}`);
+                await this.fetchFriends();
+                return { success: true };
+            } catch (err) {
+                console.error('Failed to unfriend', err);
+                return { success: false, message: 'Failed to unfriend' };
+            }
         }
     }
 });

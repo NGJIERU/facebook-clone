@@ -45,6 +45,11 @@ const handleAccept = async (friendshipId) => {
 const handleReject = async (friendshipId) => {
     await friendStore.rejectFriendRequest(friendshipId);
 };
+
+const handleUnfriend = async (friendId) => {
+    if (!confirm('Are you sure you want to unfriend this person?')) return;
+    await friendStore.unfriend(friendId);
+};
 </script>
 
 <template>
@@ -137,14 +142,22 @@ const handleReject = async (friendshipId) => {
                 </div>
 
                 <div v-else class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div v-for="friend in friendStore.friends" :key="friend.userId" class="flex items-center gap-3 p-3 border rounded hover:bg-gray-50">
-                        <div class="bg-blue-100 w-10 h-10 rounded-full flex items-center justify-center text-blue-600 font-bold">
-                            {{ friend.username?.charAt(0).toUpperCase() }}
+                    <div v-for="friend in friendStore.friends" :key="friend.id" class="flex items-center justify-between p-3 border rounded hover:bg-gray-50">
+                        <div class="flex items-center gap-3">
+                            <div class="bg-blue-100 w-10 h-10 rounded-full overflow-hidden flex items-center justify-center text-blue-600 font-bold">
+                                <img v-if="friend.profilePicUrl" :src="friend.profilePicUrl" class="w-full h-full object-cover" />
+                                <span v-else>{{ friend.username?.charAt(0).toUpperCase() }}</span>
+                            </div>
+                            <div>
+                                <div class="font-medium text-gray-900">{{ friend.username }}</div>
+                            </div>
                         </div>
-                        <div>
-                            <div class="font-medium text-gray-900">{{ friend.username }}</div>
-                            <div class="text-xs text-gray-500">{{ friend.userId }}</div>
-                        </div>
+                        <button 
+                            @click="handleUnfriend(friend.id)" 
+                            class="text-red-500 hover:text-red-700 text-sm px-3 py-1 border border-red-300 rounded hover:bg-red-50"
+                        >
+                            Unfriend
+                        </button>
                     </div>
                 </div>
             </div>

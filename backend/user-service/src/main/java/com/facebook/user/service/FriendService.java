@@ -137,4 +137,13 @@ public class FriendService {
                     .build();
         }).toList();
     }
+
+    @Transactional
+    public void unfriend(String userId, String friendId) {
+        Friendship friendship = friendshipRepository.findAcceptedBetween(userId, friendId)
+                .orElseThrow(() -> new IllegalArgumentException("Friendship not found"));
+        
+        friendshipRepository.delete(friendship);
+        log.info("Unfriended: {} and {}", userId, friendId);
+    }
 }

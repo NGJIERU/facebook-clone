@@ -81,8 +81,9 @@ const getObjectUrl = (file) => {
 <template>
   <div class="bg-white p-4 rounded-lg shadow mb-6">
     <div class="flex gap-4">
-      <div class="w-10 h-10 bg-gray-300 rounded-full flex-shrink-0 flex items-center justify-center">
-         <span class="text-gray-600 font-bold">{{ authStore.user?.username?.charAt(0) || 'U' }}</span>
+      <div class="w-10 h-10 bg-gray-300 rounded-full flex-shrink-0 overflow-hidden flex items-center justify-center">
+         <img v-if="authStore.user?.profilePicUrl" :src="authStore.user.profilePicUrl" class="w-full h-full object-cover" />
+         <span v-else class="text-gray-600 font-bold">{{ authStore.user?.username?.charAt(0) || 'U' }}</span>
       </div>
       <div class="flex-grow">
         <textarea 

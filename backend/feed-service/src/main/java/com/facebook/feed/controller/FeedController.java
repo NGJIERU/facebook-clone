@@ -174,4 +174,37 @@ public class FeedController {
             @org.springframework.web.bind.annotation.PathVariable String userId) {
         return org.springframework.http.ResponseEntity.ok(repository.findByAuthorIdOrderByCreatedAtDesc(userId));
     }
+
+    @org.springframework.web.bind.annotation.DeleteMapping("/api/feed/posts/{postId}")
+    public org.springframework.http.ResponseEntity<?> deletePost(
+            @org.springframework.web.bind.annotation.PathVariable java.util.UUID postId) {
+        var authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null || !authentication.isAuthenticated()) {
+            return org.springframework.http.ResponseEntity.status(401).body("Not authenticated");
+        }
+
+        String token = (String) authentication.getCredentials();
+        if (token == null) {
+            return org.springframework.http.ResponseEntity.status(401).body("Could not identify user");
+        }
+
+        final String currentUserId;
+        try {
+            currentUserId = extractUserIdFromToken("Bearer " + token);
+        } catch (Exception e) {
+            log.error("Failed to extract userId", e);
+            return org.springframework.http.ResponseEntity.status(401).body("Could not identify user");
+        }
+
+        return repository.findById(postId)
+                .map(post -> {
+                    if (!post.getAuthorId().equals(currentUserId)) {
+                        return org.springframework.http.ResponseEntity.status(403).body("You can only delete your own posts");
+                    }
+                    repository.delete(post);
+                    log.info("Deleted post {} by user {}", postId, currentUserId);
+                    return org.springframework.http.ResponseEntity.ok().body("Post deleted");
+                })
+                .orElse(org.springframework.http.ResponseEntity.notFound().build());
+    }
 }

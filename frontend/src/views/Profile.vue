@@ -89,6 +89,31 @@
         <div class="modal-content" @click.stop>
           <h2>Edit Profile</h2>
           <form @submit.prevent="saveProfile">
+            <!-- Profile Picture -->
+            <div class="form-group">
+              <label>Profile Picture</label>
+              <div class="flex items-center gap-4">
+                <div class="w-16 h-16 rounded-full overflow-hidden bg-blue-500 flex items-center justify-center">
+                  <img v-if="editForm.profilePicUrl" :src="editForm.profilePicUrl" class="w-full h-full object-cover" />
+                  <span v-else class="text-white text-2xl font-bold">{{ editForm.username?.charAt(0)?.toUpperCase() }}</span>
+                </div>
+                <input type="file" ref="modalProfilePicInput" @change="handleModalProfilePic" accept="image/*" class="hidden" />
+                <button type="button" @click="$refs.modalProfilePicInput.click()" class="px-3 py-1 bg-gray-200 rounded text-sm hover:bg-gray-300">
+                  {{ uploadingModalPic ? 'Uploading...' : 'Change Photo' }}
+                </button>
+              </div>
+            </div>
+            <!-- Cover Picture -->
+            <div class="form-group">
+              <label>Cover Photo</label>
+              <div class="w-full h-20 rounded overflow-hidden bg-gradient-to-r from-blue-500 to-purple-500">
+                <img v-if="editForm.coverPicUrl" :src="editForm.coverPicUrl" class="w-full h-full object-cover" />
+              </div>
+              <input type="file" ref="modalCoverPicInput" @change="handleModalCoverPic" accept="image/*" class="hidden" />
+              <button type="button" @click="$refs.modalCoverPicInput.click()" class="mt-2 px-3 py-1 bg-gray-200 rounded text-sm hover:bg-gray-300">
+                {{ uploadingModalCover ? 'Uploading...' : 'Change Cover' }}
+              </button>
+            </div>
             <div class="form-group">
               <label>Username</label>
               <input v-model="editForm.username" type="text" required>
@@ -125,10 +150,16 @@ const error = ref(null);
 const showEditModal = ref(false);
 const editForm = ref({
   username: '',
-  bio: ''
+  bio: '',
+  profilePicUrl: '',
+  coverPicUrl: ''
 });
 const profilePicInput = ref(null);
 const uploadingPic = ref(false);
+const uploadingModalPic = ref(false);
+const uploadingModalCover = ref(false);
+const modalProfilePicInput = ref(null);
+const modalCoverPicInput = ref(null);
 
 const isOwnProfile = computed(() => {
   return profile.value && authStore.user && profile.value.id === authStore.user.id;
@@ -154,7 +185,9 @@ const fetchProfile = async () => {
         profile.value = response.data;
         editForm.value = {
           username: response.data.username,
-          bio: response.data.bio || ''
+          bio: response.data.bio || '',
+          profilePicUrl: response.data.profilePicUrl || '',
+          coverPicUrl: response.data.coverPicUrl || ''
         };
         loading.value = false;
         return;
@@ -166,7 +199,9 @@ const fetchProfile = async () => {
     profile.value = response.data;
     editForm.value = {
       username: response.data.username,
-      bio: response.data.bio || ''
+      bio: response.data.bio || '',
+      profilePicUrl: response.data.profilePicUrl || '',
+      coverPicUrl: response.data.coverPicUrl || ''
     };
   } catch (err) {
     console.error('Failed to fetch profile:', err);
@@ -201,7 +236,7 @@ const saveProfile = async () => {
   try {
     const response = await api.put('/users/profile', editForm.value);
     profile.value = response.data;
-    authStore.user = response.data; // Update auth store
+    authStore.updateUser(response.data); // Update auth store and persist to localStorage
     showEditModal.value = false;
   } catch (err) {
     console.error('Failed to update profile:', err);
@@ -256,12 +291,59 @@ const uploadProfilePic = async (event) => {
     });
     
     profile.value = updateRes.data;
-    authStore.user = updateRes.data;
+    authStore.updateUser(updateRes.data);
+    editForm.value.profilePicUrl = imageUrl;
   } catch (err) {
     console.error('Failed to upload profile picture:', err);
     alert('Failed to upload profile picture');
   } finally {
     uploadingPic.value = false;
+  }
+};
+
+const handleModalProfilePic = async (event) => {
+  const file = event.target.files[0];
+  if (!file) return;
+  
+  uploadingModalPic.value = true;
+  try {
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('userId', authStore.user.id);
+    
+    const uploadRes = await api.post('/media/upload', formData, {
+      headers: { 'Content-Type': 'multipart/form-data' }
+    });
+    
+    editForm.value.profilePicUrl = uploadRes.data.url;
+  } catch (err) {
+    console.error('Failed to upload profile picture:', err);
+    alert('Failed to upload profile picture');
+  } finally {
+    uploadingModalPic.value = false;
+  }
+};
+
+const handleModalCoverPic = async (event) => {
+  const file = event.target.files[0];
+  if (!file) return;
+  
+  uploadingModalCover.value = true;
+  try {
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('userId', authStore.user.id);
+    
+    const uploadRes = await api.post('/media/upload', formData, {
+      headers: { 'Content-Type': 'multipart/form-data' }
+    });
+    
+    editForm.value.coverPicUrl = uploadRes.data.url;
+  } catch (err) {
+    console.error('Failed to upload cover picture:', err);
+    alert('Failed to upload cover picture');
+  } finally {
+    uploadingModalCover.value = false;
   }
 };
 

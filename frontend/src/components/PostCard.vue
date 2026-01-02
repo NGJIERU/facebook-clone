@@ -1,6 +1,12 @@
 <script setup>
 import { computed, ref, onMounted } from 'vue';
+import { useRouter } from 'vue-router';
+import { useAuthStore } from '../stores/auth';
 import api from '../utils/api';
+
+const router = useRouter();
+const authStore = useAuthStore();
+const emit = defineEmits(['post-deleted']);
 
 const props = defineProps({
   post: {
@@ -18,6 +24,7 @@ const comments = ref([]);
 const newComment = ref('');
 const loadingComments = ref(false);
 const commentAuthors = ref({});
+const isOwnPost = computed(() => authStore.user?.id === props.post.authorId);
 
 onMounted(async () => {
   // Fetch author profile (name and picture)
@@ -132,19 +139,48 @@ const formatCommentDate = (dateString) => {
   if (hours < 24) return `${hours}h`;
   return date.toLocaleDateString();
 };
+
+const deletePost = async () => {
+  if (!confirm('Are you sure you want to delete this post?')) return;
+  try {
+    await api.delete(`/feed/posts/${props.post.id}`);
+    emit('post-deleted', props.post.id);
+  } catch (e) {
+    console.error('Failed to delete post', e);
+    alert('Failed to delete post');
+  }
+};
+
+const goToAuthorProfile = () => {
+  router.push(`/profile/${props.post.authorId}`);
+};
 </script>
 
 <template>
   <div class="bg-white p-4 rounded-lg shadow mb-4">
-    <div class="flex items-center mb-4">
-      <div class="w-10 h-10 rounded-full overflow-hidden flex items-center justify-center mr-3" :class="{ 'bg-gray-300': !authorProfilePic }">
-        <img v-if="authorProfilePic" :src="authorProfilePic" class="w-full h-full object-cover" />
-        <span v-else class="text-gray-600 font-bold">{{ displayName?.charAt(0)?.toUpperCase() || 'U' }}</span>
+    <div class="flex items-center justify-between mb-4">
+      <div class="flex items-center">
+        <div 
+          @click="goToAuthorProfile" 
+          class="w-10 h-10 rounded-full overflow-hidden flex items-center justify-center mr-3 cursor-pointer hover:opacity-80" 
+          :class="{ 'bg-gray-300': !authorProfilePic }"
+        >
+          <img v-if="authorProfilePic" :src="authorProfilePic" class="w-full h-full object-cover" />
+          <span v-else class="text-gray-600 font-bold">{{ displayName?.charAt(0)?.toUpperCase() || 'U' }}</span>
+        </div>
+        <div>
+          <h3 @click="goToAuthorProfile" class="font-bold text-gray-800 cursor-pointer hover:underline">{{ displayName }}</h3>
+          <p class="text-xs text-gray-500">{{ formattedDate }}</p>
+        </div>
       </div>
-      <div>
-        <h3 class="font-bold text-gray-800">{{ displayName }}</h3>
-        <p class="text-xs text-gray-500">{{ formattedDate }}</p>
-      </div>
+      <button 
+        v-if="isOwnPost" 
+        @click="deletePost" 
+        class="text-gray-400 hover:text-red-500 p-2 rounded-full hover:bg-gray-100 transition"
+        title="Delete post"
+      >
+        🗑️
+      </button>
     </div>
     
     <p class="text-gray-800 mb-4">{{ post.content }}</p>
