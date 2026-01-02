@@ -8,7 +8,7 @@
         <div class="flex items-center gap-6">
           <button @click="router.push('/')" class="text-gray-600 dark:text-gray-300 hover:text-blue-600 font-medium">Home</button>
           <button @click="router.push('/friends')" class="text-gray-600 dark:text-gray-300 hover:text-blue-600 font-medium">Friends</button>
-          <button @click="handleLogout" class="text-gray-500 hover:text-red-600 transition font-medium text-sm">Logout</button>
+          <button @click="handleLogout" class="text-gray-500 dark:text-gray-400 hover:text-red-600 transition font-medium text-sm">Logout</button>
         </div>
       </div>
     </nav>
@@ -487,6 +487,11 @@ onMounted(async () => {
   background: #f0f2f5;
 }
 
+:global(.dark) .profile-picture {
+  border-color: #1f2937;
+  background: #374151;
+}
+
 .profile-picture img {
   width: 100%;
   height: 100%;
@@ -579,6 +584,10 @@ onMounted(async () => {
   color: #65676b;
 }
 
+:global(.dark) .no-posts {
+  color: #9ca3af;
+}
+
 .posts-list {
   display: flex;
   flex-direction: column;
@@ -622,6 +631,10 @@ onMounted(async () => {
   color: #65676b;
 }
 
+:global(.dark) .post-time {
+  color: #9ca3af;
+}
+
 .post-content {
   margin: 0 0 12px;
   font-size: 15px;
@@ -650,6 +663,11 @@ onMounted(async () => {
   border-top: 1px solid #e4e6eb;
   font-size: 14px;
   color: #65676b;
+}
+
+:global(.dark) .post-actions {
+  border-color: #374151;
+  color: #9ca3af;
 }
 
 /* Modal Styles */
