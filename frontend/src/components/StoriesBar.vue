@@ -140,7 +140,7 @@
       </div>
 
       <!-- Story Content -->
-      <div class="w-full max-w-lg h-[80vh] flex items-center justify-center">
+      <div class="w-full max-w-lg h-[80vh] flex flex-col items-center justify-center relative">
         <img 
           v-if="currentStory?.imageUrl" 
           :src="currentStory.imageUrl" 
@@ -148,6 +148,14 @@
         />
         <div v-else class="bg-gradient-to-b from-purple-500 to-pink-500 w-full h-full flex items-center justify-center p-8">
           <p class="text-white text-2xl text-center">{{ currentStory?.text }}</p>
+        </div>
+        
+        <!-- Show text caption if story has both image and text -->
+        <div 
+          v-if="currentStory?.imageUrl && currentStory?.text" 
+          class="absolute bottom-4 left-4 right-4 bg-black/60 rounded-lg p-3"
+        >
+          <p class="text-white text-center">{{ currentStory.text }}</p>
         </div>
       </div>
 
@@ -167,7 +175,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue';
+import { ref, computed, onMounted, onUnmounted, watch } from 'vue';
 import { useAuthStore } from '../stores/auth';
 import api, { uploadMedia } from '../utils/api';
 
@@ -185,9 +193,39 @@ const fileInput = ref(null);
 const viewingStory = ref(false);
 const currentUserIndex = ref(0);
 const currentStoryIndex = ref(0);
+let storyTimer = null;
+
+const STORY_DURATION = 5000; // 5 seconds per story
+
+const startStoryTimer = () => {
+  clearStoryTimer();
+  storyTimer = setTimeout(() => {
+    nextStory();
+  }, STORY_DURATION);
+};
+
+const clearStoryTimer = () => {
+  if (storyTimer) {
+    clearTimeout(storyTimer);
+    storyTimer = null;
+  }
+};
+
+// Watch for story changes to restart timer
+watch([currentUserIndex, currentStoryIndex, viewingStory], ([, , isViewing]) => {
+  if (isViewing) {
+    startStoryTimer();
+  } else {
+    clearStoryTimer();
+  }
+});
 
 onMounted(async () => {
   await fetchStories();
+});
+
+onUnmounted(() => {
+  clearStoryTimer();
 });
 
 const fetchStories = async () => {
@@ -338,8 +376,11 @@ const formatTime = (dateString) => {
   const date = new Date(dateString);
   const now = new Date();
   const diff = now - date;
+  const minutes = Math.floor(diff / 60000);
   const hours = Math.floor(diff / 3600000);
-  if (hours < 1) return 'Just now';
+  
+  if (minutes < 1) return 'Just now';
+  if (minutes < 60) return `${minutes}m ago`;
   if (hours < 24) return `${hours}h ago`;
   return date.toLocaleDateString();
 };
