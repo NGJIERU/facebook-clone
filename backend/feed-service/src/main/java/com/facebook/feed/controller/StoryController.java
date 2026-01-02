@@ -12,7 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
-import java.nio.charset.StandardCharsets;
+import io.jsonwebtoken.io.Decoders;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
@@ -20,7 +20,7 @@ import java.util.Map;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/api/stories")
+@RequestMapping("/api/feed/stories")
 @RequiredArgsConstructor
 @Slf4j
 public class StoryController {
@@ -32,8 +32,9 @@ public class StoryController {
 
     private String extractUserIdFromToken(String authHeader) {
         String token = authHeader.replace("Bearer ", "");
+        byte[] keyBytes = Decoders.BASE64.decode(secretKey);
         Claims claims = Jwts.parserBuilder()
-                .setSigningKey(Keys.hmacShaKeyFor(secretKey.getBytes(StandardCharsets.UTF_8)))
+                .setSigningKey(Keys.hmacShaKeyFor(keyBytes))
                 .build()
                 .parseClaimsJws(token)
                 .getBody();
