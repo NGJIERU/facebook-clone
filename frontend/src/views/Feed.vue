@@ -68,7 +68,7 @@ const handlePostCreated = () => {
           <button @click="router.push('/friends')" class="text-gray-600 hover:text-blue-600 font-medium">Friends</button>
           <NotificationDropdown />
           
-          <div class="flex items-center gap-2">
+          <div class="flex items-center gap-2 cursor-pointer" @click="router.push('/profile')">
               <div class="bg-blue-100 w-8 h-8 rounded-full flex items-center justify-center text-blue-600 font-bold text-sm">
                   {{ authStore.user?.username?.charAt(0).toUpperCase() }}
               </div>

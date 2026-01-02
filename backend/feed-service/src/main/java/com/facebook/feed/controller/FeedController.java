@@ -168,4 +168,10 @@ public class FeedController {
 
         return savedPost;
     }
+
+    @org.springframework.web.bind.annotation.GetMapping("/api/feed/user/{userId}")
+    public org.springframework.http.ResponseEntity<List<FeedPost>> getUserPostsRest(
+            @org.springframework.web.bind.annotation.PathVariable String userId) {
+        return org.springframework.http.ResponseEntity.ok(repository.findByAuthorIdOrderByCreatedAtDesc(userId));
+    }
 }

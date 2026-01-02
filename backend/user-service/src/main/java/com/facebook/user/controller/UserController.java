@@ -19,19 +19,6 @@ public class UserController {
     @org.springframework.beans.factory.annotation.Value("${application.security.jwt.secret-key}")
     private String secretKey;
 
-    private String extractUserIdFromToken(String token) {
-        if (token == null || !token.startsWith("Bearer ")) {
-            throw new RuntimeException("Invalid token format");
-        }
-        String jwt = token.substring(7);
-        io.jsonwebtoken.Claims claims = io.jsonwebtoken.Jwts.parserBuilder()
-                .setSigningKey(io.jsonwebtoken.io.Decoders.BASE64.decode(secretKey))
-                .build()
-                .parseClaimsJws(jwt)
-                .getBody();
-        return claims.get("userId", String.class);
-    }
-
     @GetMapping("/profile")
     public ResponseEntity<UserProfile> getMyProfile(@RequestHeader("Authorization") String token) {
         String userId = extractUserIdFromToken(token);
@@ -50,5 +37,41 @@ public class UserController {
     @GetMapping("/search")
     public ResponseEntity<List<UserProfile>> searchUsers(@RequestParam String query) {
         return ResponseEntity.ok(repository.findByUsernameContainingIgnoreCase(query));
+    }
+
+    @GetMapping("/profile/{userId}")
+    public ResponseEntity<UserProfile> getProfile(@PathVariable String userId) {
+        return repository.findById(java.util.UUID.fromString(userId))
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
+    }
+
+    @PutMapping("/profile")
+    public ResponseEntity<UserProfile> updateProfile(
+            @RequestHeader("Authorization") String token,
+            @RequestBody UserProfile updatedProfile) {
+        String userId = extractUserIdFromToken(token);
+        return repository.findById(java.util.UUID.fromString(userId))
+                .map(profile -> {
+                    profile.setUsername(updatedProfile.getUsername());
+                    profile.setBio(updatedProfile.getBio());
+                    profile.setProfilePicUrl(updatedProfile.getProfilePicUrl());
+                    profile.setCoverPicUrl(updatedProfile.getCoverPicUrl());
+                    return ResponseEntity.ok(repository.save(profile));
+                })
+                .orElse(ResponseEntity.notFound().build());
+    }
+
+    private String extractUserIdFromToken(String token) {
+        if (token == null || !token.startsWith("Bearer ")) {
+            throw new RuntimeException("Invalid token format");
+        }
+        String jwt = token.substring(7);
+        io.jsonwebtoken.Claims claims = io.jsonwebtoken.Jwts.parserBuilder()
+                .setSigningKey(io.jsonwebtoken.io.Decoders.BASE64.decode(secretKey))
+                .build()
+                .parseClaimsJws(jwt)
+                .getBody();
+        return claims.get("userId", String.class);
     }
 }
