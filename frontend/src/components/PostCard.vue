@@ -1,5 +1,6 @@
 <script setup>
-import { computed, ref } from 'vue';
+import { computed, ref, onMounted } from 'vue';
+import api from '../utils/api';
 
 const props = defineProps({
   post: {
@@ -7,6 +8,22 @@ const props = defineProps({
     required: true
   }
 });
+
+const authorName = ref(null);
+
+onMounted(async () => {
+  if (props.post.authorId) {
+    try {
+      const response = await api.get(`/users/profile/${props.post.authorId}`);
+      authorName.value = response.data.username;
+    } catch (e) {
+      console.warn('Failed to fetch author profile', e);
+      authorName.value = null;
+    }
+  }
+});
+
+const displayName = computed(() => authorName.value || props.post.authorId || 'Unknown User');
 
 const formattedDate = computed(() => {
   if (!props.post.createdAt) return '';
@@ -21,10 +38,10 @@ const imageError = ref(false);
   <div class="bg-white p-4 rounded-lg shadow mb-4">
     <div class="flex items-center mb-4">
       <div class="w-10 h-10 bg-gray-300 rounded-full flex items-center justify-center mr-3">
-        <span class="text-gray-600 font-bold">{{ post.authorId?.charAt(0) || 'U' }}</span>
+        <span class="text-gray-600 font-bold">{{ displayName?.charAt(0)?.toUpperCase() || 'U' }}</span>
       </div>
       <div>
-        <h3 class="font-bold text-gray-800">{{ post.authorId || 'Unknown User' }}</h3>
+        <h3 class="font-bold text-gray-800">{{ displayName }}</h3>
         <p class="text-xs text-gray-500">{{ formattedDate }}</p>
       </div>
     </div>

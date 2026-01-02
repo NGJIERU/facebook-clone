@@ -6,9 +6,9 @@ import { watch, onMounted } from 'vue';
 const authStore = useAuthStore();
 const notificationStore = useNotificationStore();
 
-// Connect if logged in on mount
+// Connect if logged in on mount (only if user has id)
 onMounted(() => {
-  if (authStore.user) {
+  if (authStore.user && authStore.user.id) {
     notificationStore.connect();
   }
 });

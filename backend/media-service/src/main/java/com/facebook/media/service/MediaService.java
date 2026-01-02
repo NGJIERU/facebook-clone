@@ -4,7 +4,7 @@ import com.facebook.media.model.Media;
 import org.springframework.web.multipart.MultipartFile;
 
 public interface MediaService {
-    Media uploadFile(MultipartFile file, Long userId);
+    Media uploadFile(MultipartFile file, String userId);
 
     Media getFile(String id);
 

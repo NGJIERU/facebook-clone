@@ -55,7 +55,7 @@ public class MediaServiceImpl implements MediaService {
     }
 
     @Override
-    public Media uploadFile(MultipartFile file, Long userId) {
+    public Media uploadFile(MultipartFile file, String userId) {
         String originalFileName = file.getOriginalFilename();
         String contentType = file.getContentType();
         long size = file.getSize();
