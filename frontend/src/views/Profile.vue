@@ -32,11 +32,11 @@
       <!-- Profile Content -->
       <div v-else>
         <!-- Profile Header -->
-        <div v-if="profile" class="profile-header dark:bg-gray-800">
+        <div v-if="profile" class="profile-header bg-white dark:bg-gray-800">
           <div class="cover-photo" :style="{ backgroundImage: profile.coverPicUrl ? `url(${profile.coverPicUrl})` : 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' }"></div>
           
           <div class="profile-info">
-            <div class="profile-picture" @click="isOwnProfile && triggerProfilePicUpload()">
+            <div class="profile-picture border-white dark:border-gray-800 bg-gray-100 dark:bg-gray-700" @click="isOwnProfile && triggerProfilePicUpload()">
               <img v-if="profile.profilePicUrl" :src="profile.profilePicUrl" class="w-full h-full object-cover" />
               <div v-else class="bg-blue-500 w-full h-full flex items-center justify-center text-white text-6xl font-bold">
                 {{ profile.username?.charAt(0).toUpperCase() }}
@@ -48,8 +48,8 @@
             </div>
             
             <div class="profile-details">
-              <h1 class="dark:text-white">{{ profile.username }}</h1>
-              <p class="bio dark:text-gray-400">{{ profile.bio || 'No bio yet' }}</p>
+              <h1 class="text-gray-900 dark:text-white">{{ profile.username }}</h1>
+              <p class="bio text-gray-500 dark:text-gray-400">{{ profile.bio || 'No bio yet' }}</p>
             </div>
             
             <button v-if="isOwnProfile" @click="showEditModal = true" class="edit-button">
@@ -62,22 +62,22 @@
         </div>
 
         <!-- Settings Section for own profile -->
-        <div v-if="isOwnProfile" class="settings-section dark:bg-gray-800">
-          <h3 class="dark:text-white">Quick Settings</h3>
+        <div v-if="isOwnProfile" class="settings-section bg-gray-800">
+          <h3 class="text-white">Quick Settings</h3>
           <div class="settings-grid">
-            <div class="setting-item dark:bg-gray-700 dark:text-gray-200" @click="router.push('/saved')">
+            <div class="setting-item bg-gray-700 text-gray-200 hover:bg-gray-600" @click="router.push('/saved')">
               <span class="setting-icon">🔖</span>
               <span>Saved Posts</span>
             </div>
-            <div class="setting-item dark:bg-gray-700 dark:text-gray-200" @click="router.push('/friends')">
+            <div class="setting-item bg-gray-700 text-gray-200 hover:bg-gray-600" @click="router.push('/friends')">
               <span class="setting-icon">👥</span>
               <span>Friends</span>
             </div>
-            <div class="setting-item dark:bg-gray-700 dark:text-gray-200" @click="router.push('/groups')">
+            <div class="setting-item bg-gray-700 text-gray-200 hover:bg-gray-600" @click="router.push('/groups')">
               <span class="setting-icon">👨‍👩‍👧‍👦</span>
               <span>Groups</span>
             </div>
-            <div class="setting-item dark:bg-gray-700 dark:text-gray-200" @click="router.push('/events')">
+            <div class="setting-item bg-gray-700 text-gray-200 hover:bg-gray-600" @click="router.push('/events')">
               <span class="setting-icon">📅</span>
               <span>Events</span>
             </div>
@@ -85,26 +85,26 @@
         </div>
 
         <!-- Posts Feed -->
-        <div class="posts-section dark:bg-gray-800">
-          <h2 class="dark:text-white">Posts</h2>
-          <div v-if="posts.length === 0" class="no-posts dark:text-gray-400">
+        <div class="posts-section bg-white dark:bg-gray-800">
+          <h2 class="text-gray-900 dark:text-white">Posts</h2>
+          <div v-if="posts.length === 0" class="no-posts text-gray-500 dark:text-gray-400">
             <p>{{ isOwnProfile ? 'You haven\'t posted anything yet' : 'No posts yet' }}</p>
           </div>
           <div v-else class="posts-list">
-            <div v-for="post in posts" :key="post.id" class="post-card dark:bg-gray-700 dark:border-gray-600">
+            <div v-for="post in posts" :key="post.id" class="post-card bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600">
               <div class="post-header">
                 <div class="post-avatar w-10 h-10 rounded-full overflow-hidden flex items-center justify-center text-white font-bold" :class="{ 'bg-blue-500': !profile.profilePicUrl }">
                   <img v-if="profile.profilePicUrl" :src="profile.profilePicUrl" class="w-full h-full object-cover" />
                   <span v-else>{{ profile.username?.charAt(0).toUpperCase() }}</span>
                 </div>
                 <div>
-                  <h3 class="dark:text-white">{{ profile.username }}</h3>
-                  <p class="post-time dark:text-gray-400">{{ formatDate(post.createdAt) }}</p>
+                  <h3 class="text-gray-900 dark:text-white">{{ profile.username }}</h3>
+                  <p class="post-time text-gray-500 dark:text-gray-400">{{ formatDate(post.createdAt) }}</p>
                 </div>
               </div>
-              <p class="post-content dark:text-gray-200">{{ post.content }}</p>
+              <p class="post-content text-gray-900 dark:text-gray-200">{{ post.content }}</p>
               <img v-if="post.imageUrl" :src="post.imageUrl" :alt="'Post image'" class="post-image">
-              <div class="post-actions dark:border-gray-600 dark:text-gray-400">
+              <div class="post-actions border-t border-gray-200 dark:border-gray-600 text-gray-500 dark:text-gray-400">
                 <span>👍 {{ post.likesCount }} Likes</span>
                 <span>💬 {{ post.commentsCount }} Comments</span>
               </div>
@@ -457,15 +457,10 @@ onMounted(async () => {
 }
 
 .profile-header {
-  background: white;
   border-radius: 12px;
   overflow: hidden;
   margin-bottom: 24px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-}
-
-:global(.dark) .profile-header {
-  background: #1f2937;
 }
 
 .cover-photo {
@@ -484,16 +479,11 @@ onMounted(async () => {
   height: 150px;
   border-radius: 50%;
   overflow: hidden;
-  border: 5px solid white;
+  border-width: 5px;
+  border-style: solid;
   position: relative;
   top: -75px;
   margin-bottom: -75px;
-  background: #f0f2f5;
-}
-
-:global(.dark) .profile-picture {
-  border-color: #1f2937;
-  background: #374151;
 }
 
 .profile-picture img {
@@ -527,21 +517,11 @@ onMounted(async () => {
 .profile-details h1 {
   font-size: 32px;
   margin: 0 0 8px;
-  color: #1c1e21;
-}
-
-:global(.dark) .profile-details h1 {
-  color: #f3f4f6;
 }
 
 .bio {
-  color: #65676b;
   font-size: 16px;
   margin: 0;
-}
-
-:global(.dark) .bio {
-  color: #9ca3af;
 }
 
 .edit-button {
@@ -562,34 +542,19 @@ onMounted(async () => {
 }
 
 .posts-section {
-  background: white;
   border-radius: 12px;
   padding: 24px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
-:global(.dark) .posts-section {
-  background: #1f2937;
-}
-
 .posts-section h2 {
   margin: 0 0 20px;
   font-size: 24px;
-  color: #1c1e21;
-}
-
-:global(.dark) .posts-section h2 {
-  color: #f3f4f6;
 }
 
 .no-posts {
   text-align: center;
   padding: 40px 20px;
-  color: #65676b;
-}
-
-:global(.dark) .no-posts {
-  color: #9ca3af;
 }
 
 .posts-list {
@@ -599,14 +564,8 @@ onMounted(async () => {
 }
 
 .post-card {
-  border: 1px solid #e4e6eb;
   border-radius: 8px;
   padding: 16px;
-}
-
-:global(.dark) .post-card {
-  border-color: #374151;
-  background: #111827;
 }
 
 .post-header {
@@ -632,26 +591,12 @@ onMounted(async () => {
 .post-time {
   margin: 0;
   font-size: 13px;
-  color: #65676b;
-}
-
-:global(.dark) .post-time {
-  color: #9ca3af;
 }
 
 .post-content {
   margin: 0 0 12px;
   font-size: 15px;
   line-height: 1.5;
-  color: #1c1e21;
-}
-
-:global(.dark) .post-content {
-  color: #e5e7eb;
-}
-
-:global(.dark) .post-header h3 {
-  color: #f3f4f6;
 }
 
 .post-image {
@@ -664,14 +609,7 @@ onMounted(async () => {
   display: flex;
   gap: 20px;
   padding-top: 12px;
-  border-top: 1px solid #e4e6eb;
   font-size: 14px;
-  color: #65676b;
-}
-
-:global(.dark) .post-actions {
-  border-color: #374151;
-  color: #9ca3af;
 }
 
 /* Modal Styles */
@@ -689,24 +627,15 @@ onMounted(async () => {
 }
 
 .modal-content {
-  background: white;
   border-radius: 12px;
   padding: 24px;
   width: 90%;
   max-width: 500px;
 }
 
-:global(.dark) .modal-content {
-  background: #1f2937;
-}
-
 .modal-content h2 {
   margin: 0 0 20px;
   font-size: 20px;
-}
-
-:global(.dark) .modal-content h2 {
-  color: #f3f4f6;
 }
 
 .form-group {
@@ -808,25 +737,15 @@ onMounted(async () => {
 
 /* Settings Section */
 .settings-section {
-  background: white;
   border-radius: 12px;
   padding: 20px 24px;
   margin-bottom: 24px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
-:global(.dark) .settings-section {
-  background: #1f2937;
-}
-
 .settings-section h3 {
   margin: 0 0 16px;
   font-size: 18px;
-  color: #1c1e21;
-}
-
-:global(.dark) .settings-section h3 {
-  color: #f3f4f6;
 }
 
 .settings-grid {
@@ -841,23 +760,9 @@ onMounted(async () => {
   align-items: center;
   gap: 8px;
   padding: 16px;
-  background: #f0f2f5;
   border-radius: 8px;
   cursor: pointer;
   transition: background 0.2s;
-}
-
-.setting-item:hover {
-  background: #e4e6eb;
-}
-
-:global(.dark) .setting-item {
-  background: #374151;
-  color: #e5e7eb;
-}
-
-:global(.dark) .setting-item:hover {
-  background: #4b5563;
 }
 
 .setting-icon {

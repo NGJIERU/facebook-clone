@@ -7,7 +7,6 @@ const router = useRouter();
 const searchQuery = ref('');
 const showResults = ref(false);
 const loading = ref(false);
-const activeTab = ref('all');
 
 const results = ref({
   users: [],
@@ -16,14 +15,6 @@ const results = ref({
   events: []
 });
 
-const tabs = [
-  { id: 'all', label: 'All' },
-  { id: 'users', label: 'People' },
-  { id: 'posts', label: 'Posts' },
-  { id: 'groups', label: 'Groups' },
-  { id: 'events', label: 'Events' }
-];
-
 const hasResults = computed(() => {
   return results.value.users.length > 0 || 
          results.value.posts.length > 0 || 
@@ -31,21 +22,31 @@ const hasResults = computed(() => {
          results.value.events.length > 0;
 });
 
-const filteredResults = computed(() => {
-  if (activeTab.value === 'all') {
-    return {
-      users: results.value.users.slice(0, 3),
-      posts: results.value.posts.slice(0, 3),
-      groups: results.value.groups.slice(0, 3),
-      events: results.value.events.slice(0, 3)
-    };
-  }
-  return {
-    users: activeTab.value === 'users' ? results.value.users : [],
-    posts: activeTab.value === 'posts' ? results.value.posts : [],
-    groups: activeTab.value === 'groups' ? results.value.groups : [],
-    events: activeTab.value === 'events' ? results.value.events : []
-  };
+// Combine all results into a single unified list
+const unifiedResults = computed(() => {
+  const combined = [];
+  
+  // Add users first (prioritize people)
+  results.value.users.forEach(user => {
+    combined.push({ type: 'user', data: user });
+  });
+  
+  // Add groups
+  results.value.groups.forEach(group => {
+    combined.push({ type: 'group', data: group });
+  });
+  
+  // Add events
+  results.value.events.forEach(event => {
+    combined.push({ type: 'event', data: event });
+  });
+  
+  // Add posts last
+  results.value.posts.forEach(post => {
+    combined.push({ type: 'post', data: post });
+  });
+  
+  return combined.slice(0, 10); // Limit to 10 results
 });
 
 let searchTimeout = null;
@@ -120,113 +121,76 @@ const handleClickOutside = (e) => {
 
 <template>
   <div class="search-container relative" @click.stop>
-    <div class="search-input-wrapper">
+    <div class="search-input-wrapper bg-gray-700">
       <span class="search-icon">🔍</span>
       <input 
         v-model="searchQuery"
         type="text"
         placeholder="Search Facebook..."
-        class="search-input"
+        class="search-input text-white placeholder-gray-400"
         @focus="searchQuery.trim() && (showResults = true)"
       />
       <button v-if="searchQuery" @click="closeSearch" class="clear-btn">✕</button>
     </div>
     
     <!-- Search Results Dropdown -->
-    <div v-if="showResults" class="search-results" @click.stop>
-      <!-- Tabs -->
-      <div class="search-tabs">
-        <button 
-          v-for="tab in tabs" 
-          :key="tab.id"
-          @click="activeTab = tab.id"
-          :class="['tab-btn', activeTab === tab.id ? 'active' : '']"
-        >
-          {{ tab.label }}
-        </button>
-      </div>
-      
+    <div v-if="showResults" class="search-results bg-gray-800 border border-gray-700" @click.stop>
       <!-- Loading -->
       <div v-if="loading" class="search-loading">
         <div class="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600 mx-auto"></div>
       </div>
       
-      <!-- Results -->
+      <!-- Unified Results List -->
       <div v-else-if="hasResults" class="results-list">
-        <!-- Users -->
-        <div v-if="filteredResults.users.length > 0" class="result-section">
-          <h4 v-if="activeTab === 'all'">People</h4>
-          <div 
-            v-for="user in filteredResults.users" 
-            :key="user.id"
-            @click="goToUser(user.id)"
-            class="result-item"
-          >
-            <div class="result-avatar">
-              <img v-if="user.profilePicUrl" :src="user.profilePicUrl" class="w-full h-full object-cover" />
-              <span v-else>{{ user.username?.charAt(0)?.toUpperCase() }}</span>
+        <div 
+          v-for="(item, index) in unifiedResults" 
+          :key="`${item.type}-${item.data.id || index}`"
+          @click="item.type === 'user' ? goToUser(item.data.id) : item.type === 'group' ? goToGroup(item.data.id) : item.type === 'event' ? goToEvent(item.data.id) : router.push('/')"
+          class="result-item hover:bg-gray-700"
+        >
+          <!-- User Result -->
+          <template v-if="item.type === 'user'">
+            <div class="result-avatar bg-gray-600 text-gray-200">
+              <img v-if="item.data.profilePicUrl" :src="item.data.profilePicUrl" class="w-full h-full object-cover rounded-full" />
+              <span v-else>{{ item.data.username?.charAt(0)?.toUpperCase() }}</span>
             </div>
             <div class="result-info">
-              <span class="result-name">{{ user.username }}</span>
-              <span class="result-type">Person</span>
+              <span class="result-name text-white">{{ item.data.username }}</span>
+              <span class="result-type text-gray-400">Person</span>
             </div>
-          </div>
-        </div>
-        
-        <!-- Posts -->
-        <div v-if="filteredResults.posts.length > 0" class="result-section">
-          <h4 v-if="activeTab === 'all'">Posts</h4>
-          <div 
-            v-for="post in filteredResults.posts" 
-            :key="post.id"
-            @click="router.push('/')"
-            class="result-item"
-          >
-            <div class="result-avatar post-icon">📝</div>
+          </template>
+          
+          <!-- Group Result -->
+          <template v-else-if="item.type === 'group'">
+            <div class="result-avatar bg-blue-900 text-blue-400">👥</div>
             <div class="result-info">
-              <span class="result-name">{{ post.content?.substring(0, 50) }}{{ post.content?.length > 50 ? '...' : '' }}</span>
-              <span class="result-type">Post</span>
+              <span class="result-name text-white">{{ item.data.name }}</span>
+              <span class="result-type text-gray-400">Group · {{ item.data.memberCount || 0 }} members</span>
             </div>
-          </div>
-        </div>
-        
-        <!-- Groups -->
-        <div v-if="filteredResults.groups.length > 0" class="result-section">
-          <h4 v-if="activeTab === 'all'">Groups</h4>
-          <div 
-            v-for="group in filteredResults.groups" 
-            :key="group.id"
-            @click="goToGroup(group.id)"
-            class="result-item"
-          >
-            <div class="result-avatar group-icon">👥</div>
+          </template>
+          
+          <!-- Event Result -->
+          <template v-else-if="item.type === 'event'">
+            <div class="result-avatar bg-purple-900 text-purple-400">📅</div>
             <div class="result-info">
-              <span class="result-name">{{ group.name }}</span>
-              <span class="result-type">Group · {{ group.memberCount }} members</span>
+              <span class="result-name text-white">{{ item.data.title }}</span>
+              <span class="result-type text-gray-400">Event</span>
             </div>
-          </div>
-        </div>
-        
-        <!-- Events -->
-        <div v-if="filteredResults.events.length > 0" class="result-section">
-          <h4 v-if="activeTab === 'all'">Events</h4>
-          <div 
-            v-for="event in filteredResults.events" 
-            :key="event.id"
-            @click="goToEvent(event.id)"
-            class="result-item"
-          >
-            <div class="result-avatar event-icon">📅</div>
+          </template>
+          
+          <!-- Post Result -->
+          <template v-else-if="item.type === 'post'">
+            <div class="result-avatar bg-green-900 text-green-400">📝</div>
             <div class="result-info">
-              <span class="result-name">{{ event.title }}</span>
-              <span class="result-type">Event</span>
+              <span class="result-name text-white">{{ item.data.content?.substring(0, 50) }}{{ item.data.content?.length > 50 ? '...' : '' }}</span>
+              <span class="result-type text-gray-400">Post</span>
             </div>
-          </div>
+          </template>
         </div>
       </div>
       
       <!-- No Results -->
-      <div v-else-if="searchQuery.trim() && !loading" class="no-results">
+      <div v-else-if="searchQuery.trim() && !loading" class="no-results text-gray-400">
         <p>No results found for "{{ searchQuery }}"</p>
       </div>
     </div>
@@ -242,13 +206,8 @@ const handleClickOutside = (e) => {
 .search-input-wrapper {
   display: flex;
   align-items: center;
-  background: #f0f2f5;
   border-radius: 20px;
   padding: 0 12px;
-}
-
-:global(.dark) .search-input-wrapper {
-  background: #374151;
 }
 
 .search-icon {
@@ -292,28 +251,18 @@ const handleClickOutside = (e) => {
   left: 0;
   right: 0;
   margin-top: 8px;
-  background: white;
   border-radius: 8px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
   max-height: 400px;
   overflow-y: auto;
   z-index: 100;
 }
 
-:global(.dark) .search-results {
-  background: #1f2937;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
-}
-
 .search-tabs {
   display: flex;
   padding: 8px;
-  border-bottom: 1px solid #e4e6eb;
+  border-bottom: 1px solid #374151;
   gap: 4px;
-}
-
-:global(.dark) .search-tabs {
-  border-color: #374151;
 }
 
 .tab-btn {
@@ -323,29 +272,6 @@ const handleClickOutside = (e) => {
   border-radius: 16px;
   font-size: 13px;
   cursor: pointer;
-  color: #65676b;
-}
-
-.tab-btn:hover {
-  background: #f0f2f5;
-}
-
-.tab-btn.active {
-  background: #e7f3ff;
-  color: #1877f2;
-}
-
-:global(.dark) .tab-btn {
-  color: #9ca3af;
-}
-
-:global(.dark) .tab-btn:hover {
-  background: #374151;
-}
-
-:global(.dark) .tab-btn.active {
-  background: #1e3a5f;
-  color: #60a5fa;
 }
 
 .search-loading {
@@ -362,13 +288,8 @@ const handleClickOutside = (e) => {
 
 .result-section h4 {
   font-size: 13px;
-  color: #65676b;
   margin: 8px 12px;
   font-weight: 600;
-}
-
-:global(.dark) .result-section h4 {
-  color: #9ca3af;
 }
 
 .result-item {
@@ -380,19 +301,11 @@ const handleClickOutside = (e) => {
   cursor: pointer;
 }
 
-.result-item:hover {
-  background: #f0f2f5;
-}
-
-:global(.dark) .result-item:hover {
-  background: #374151;
-}
 
 .result-avatar {
   width: 36px;
   height: 36px;
   border-radius: 50%;
-  background: #e4e6eb;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -401,19 +314,8 @@ const handleClickOutside = (e) => {
   overflow: hidden;
 }
 
-:global(.dark) .result-avatar {
-  background: #4b5563;
-  color: #e5e7eb;
-}
-
 .post-icon, .group-icon, .event-icon {
   font-size: 18px;
-  background: #e7f3ff;
-}
-
-:global(.dark) .post-icon,
-:global(.dark) .group-icon,
-:global(.dark) .event-icon {
   background: #1e3a5f;
 }
 
@@ -425,33 +327,18 @@ const handleClickOutside = (e) => {
 .result-name {
   display: block;
   font-weight: 500;
-  color: #1c1e21;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
-:global(.dark) .result-name {
-  color: #f3f4f6;
-}
-
 .result-type {
   display: block;
   font-size: 12px;
-  color: #65676b;
-}
-
-:global(.dark) .result-type {
-  color: #9ca3af;
 }
 
 .no-results {
   padding: 20px;
   text-align: center;
-  color: #65676b;
-}
-
-:global(.dark) .no-results {
-  color: #9ca3af;
 }
 </style>
