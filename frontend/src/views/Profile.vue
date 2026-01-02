@@ -1,13 +1,13 @@
 <template>
-  <div class="min-h-screen bg-gray-100">
+  <div class="min-h-screen bg-gray-100 dark:bg-gray-900">
     <!-- Navbar -->
-    <nav class="bg-white shadow sticky top-0 z-50">
+    <nav class="bg-white dark:bg-gray-800 shadow sticky top-0 z-50">
       <div class="container mx-auto px-4 h-16 flex justify-between items-center">
         <h1 class="text-2xl font-bold text-blue-600 cursor-pointer" @click="router.push('/')">Facebook</h1>
         
         <div class="flex items-center gap-6">
-          <button @click="router.push('/')" class="text-gray-600 hover:text-blue-600 font-medium">Home</button>
-          <button @click="router.push('/friends')" class="text-gray-600 hover:text-blue-600 font-medium">Friends</button>
+          <button @click="router.push('/')" class="text-gray-600 dark:text-gray-300 hover:text-blue-600 font-medium">Home</button>
+          <button @click="router.push('/friends')" class="text-gray-600 dark:text-gray-300 hover:text-blue-600 font-medium">Friends</button>
           <button @click="handleLogout" class="text-gray-500 hover:text-red-600 transition font-medium text-sm">Logout</button>
         </div>
       </div>
@@ -18,7 +18,7 @@
       <!-- Loading State -->
       <div v-if="loading" class="text-center py-20">
         <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-        <p class="text-gray-600">Loading profile...</p>
+        <p class="text-gray-600 dark:text-gray-400">Loading profile...</p>
       </div>
 
       <!-- Error State -->
@@ -55,6 +55,32 @@
             <button v-if="isOwnProfile" @click="showEditModal = true" class="edit-button">
               Edit Profile
             </button>
+            <button v-if="isOwnProfile" @click="showSettingsModal = true" class="settings-button">
+              ⚙️ Settings
+            </button>
+          </div>
+        </div>
+
+        <!-- Settings Section for own profile -->
+        <div v-if="isOwnProfile" class="settings-section">
+          <h3>Quick Settings</h3>
+          <div class="settings-grid">
+            <div class="setting-item" @click="router.push('/saved')">
+              <span class="setting-icon">🔖</span>
+              <span>Saved Posts</span>
+            </div>
+            <div class="setting-item" @click="router.push('/friends')">
+              <span class="setting-icon">👥</span>
+              <span>Friends</span>
+            </div>
+            <div class="setting-item" @click="router.push('/groups')">
+              <span class="setting-icon">👨‍👩‍👧‍👦</span>
+              <span>Groups</span>
+            </div>
+            <div class="setting-item" @click="router.push('/events')">
+              <span class="setting-icon">📅</span>
+              <span>Events</span>
+            </div>
           </div>
         </div>
 
@@ -132,6 +158,69 @@
           </form>
         </div>
       </div>
+
+      <!-- Settings Modal -->
+      <div v-if="showSettingsModal" class="modal-overlay" @click="showSettingsModal = false">
+        <div class="modal-content settings-modal" @click.stop>
+          <h2>Settings</h2>
+          
+          <div class="settings-list">
+            <div class="settings-category">
+              <h4>Account</h4>
+              <div class="setting-row" @click="showEditModal = true; showSettingsModal = false">
+                <span>✏️ Edit Profile</span>
+                <span class="arrow">›</span>
+              </div>
+              <div class="setting-row" @click="router.push('/saved'); showSettingsModal = false">
+                <span>🔖 Saved Posts</span>
+                <span class="arrow">›</span>
+              </div>
+            </div>
+            
+            <div class="settings-category">
+              <h4>Privacy</h4>
+              <div class="setting-row">
+                <span>🔒 Profile Visibility</span>
+                <span class="setting-value">Public</span>
+              </div>
+              <div class="setting-row">
+                <span>👁️ Who can see my posts</span>
+                <span class="setting-value">Everyone</span>
+              </div>
+            </div>
+            
+            <div class="settings-category">
+              <h4>Notifications</h4>
+              <div class="setting-row">
+                <span>🔔 Push Notifications</span>
+                <label class="toggle">
+                  <input type="checkbox" checked>
+                  <span class="slider"></span>
+                </label>
+              </div>
+              <div class="setting-row">
+                <span>📧 Email Notifications</span>
+                <label class="toggle">
+                  <input type="checkbox">
+                  <span class="slider"></span>
+                </label>
+              </div>
+            </div>
+            
+            <div class="settings-category danger">
+              <h4>Danger Zone</h4>
+              <div class="setting-row danger" @click="handleLogout">
+                <span>🚪 Logout</span>
+                <span class="arrow">›</span>
+              </div>
+            </div>
+          </div>
+          
+          <div class="form-actions">
+            <button type="button" @click="showSettingsModal = false" class="cancel-btn">Close</button>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </template>
@@ -151,6 +240,7 @@ const posts = ref([]);
 const loading = ref(true);
 const error = ref(null);
 const showEditModal = ref(false);
+const showSettingsModal = ref(false);
 const editForm = ref({
   username: '',
   bio: '',
@@ -370,6 +460,10 @@ onMounted(async () => {
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
+:global(.dark) .profile-header {
+  background: #1f2937;
+}
+
 .cover-photo {
   height: 250px;
   background-size: cover;
@@ -427,10 +521,18 @@ onMounted(async () => {
   color: #1c1e21;
 }
 
+:global(.dark) .profile-details h1 {
+  color: #f3f4f6;
+}
+
 .bio {
   color: #65676b;
   font-size: 16px;
   margin: 0;
+}
+
+:global(.dark) .bio {
+  color: #9ca3af;
 }
 
 .edit-button {
@@ -457,10 +559,18 @@ onMounted(async () => {
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
+:global(.dark) .posts-section {
+  background: #1f2937;
+}
+
 .posts-section h2 {
   margin: 0 0 20px;
   font-size: 24px;
   color: #1c1e21;
+}
+
+:global(.dark) .posts-section h2 {
+  color: #f3f4f6;
 }
 
 .no-posts {
@@ -479,6 +589,11 @@ onMounted(async () => {
   border: 1px solid #e4e6eb;
   border-radius: 8px;
   padding: 16px;
+}
+
+:global(.dark) .post-card {
+  border-color: #374151;
+  background: #111827;
 }
 
 .post-header {
@@ -512,6 +627,14 @@ onMounted(async () => {
   font-size: 15px;
   line-height: 1.5;
   color: #1c1e21;
+}
+
+:global(.dark) .post-content {
+  color: #e5e7eb;
+}
+
+:global(.dark) .post-header h3 {
+  color: #f3f4f6;
 }
 
 .post-image {
@@ -551,9 +674,17 @@ onMounted(async () => {
   max-width: 500px;
 }
 
+:global(.dark) .modal-content {
+  background: #1f2937;
+}
+
 .modal-content h2 {
   margin: 0 0 20px;
   font-size: 20px;
+}
+
+:global(.dark) .modal-content h2 {
+  color: #f3f4f6;
 }
 
 .form-group {
@@ -567,6 +698,10 @@ onMounted(async () => {
   color: #1c1e21;
 }
 
+:global(.dark) .form-group label {
+  color: #e5e7eb;
+}
+
 .form-group input,
 .form-group textarea {
   width: 100%;
@@ -575,6 +710,13 @@ onMounted(async () => {
   border-radius: 6px;
   font-size: 15px;
   font-family: inherit;
+}
+
+:global(.dark) .form-group input,
+:global(.dark) .form-group textarea {
+  background: #374151;
+  border-color: #4b5563;
+  color: #f3f4f6;
 }
 
 .form-group textarea {
@@ -613,5 +755,226 @@ onMounted(async () => {
 
 .save-btn:hover {
   background: #166fe5;
+}
+
+/* Settings Button */
+.settings-button {
+  position: absolute;
+  top: 56px;
+  right: 24px;
+  padding: 8px 16px;
+  background: #e4e6eb;
+  color: #1c1e21;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.settings-button:hover {
+  background: #d8dadf;
+}
+
+:global(.dark) .settings-button {
+  background: #374151;
+  color: #e5e7eb;
+}
+
+:global(.dark) .settings-button:hover {
+  background: #4b5563;
+}
+
+/* Settings Section */
+.settings-section {
+  background: white;
+  border-radius: 12px;
+  padding: 20px 24px;
+  margin-bottom: 24px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+:global(.dark) .settings-section {
+  background: #1f2937;
+}
+
+.settings-section h3 {
+  margin: 0 0 16px;
+  font-size: 18px;
+  color: #1c1e21;
+}
+
+:global(.dark) .settings-section h3 {
+  color: #f3f4f6;
+}
+
+.settings-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+}
+
+.setting-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 16px;
+  background: #f0f2f5;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.setting-item:hover {
+  background: #e4e6eb;
+}
+
+:global(.dark) .setting-item {
+  background: #374151;
+  color: #e5e7eb;
+}
+
+:global(.dark) .setting-item:hover {
+  background: #4b5563;
+}
+
+.setting-icon {
+  font-size: 24px;
+}
+
+/* Settings Modal */
+.settings-modal {
+  max-width: 450px;
+}
+
+.settings-list {
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+.settings-category {
+  margin-bottom: 20px;
+}
+
+.settings-category h4 {
+  margin: 0 0 10px;
+  font-size: 14px;
+  color: #65676b;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+:global(.dark) .settings-category h4 {
+  color: #9ca3af;
+}
+
+.settings-category.danger h4 {
+  color: #dc2626;
+}
+
+.setting-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px;
+  background: #f0f2f5;
+  border-radius: 8px;
+  margin-bottom: 8px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.setting-row:hover {
+  background: #e4e6eb;
+}
+
+:global(.dark) .setting-row {
+  background: #374151;
+  color: #e5e7eb;
+}
+
+:global(.dark) .setting-row:hover {
+  background: #4b5563;
+}
+
+.setting-row.danger {
+  color: #dc2626;
+}
+
+.setting-row.danger:hover {
+  background: #fef2f2;
+}
+
+:global(.dark) .setting-row.danger:hover {
+  background: #450a0a;
+}
+
+.setting-value {
+  color: #65676b;
+  font-size: 14px;
+}
+
+:global(.dark) .setting-value {
+  color: #9ca3af;
+}
+
+.arrow {
+  font-size: 18px;
+  color: #65676b;
+}
+
+/* Toggle Switch */
+.toggle {
+  position: relative;
+  display: inline-block;
+  width: 44px;
+  height: 24px;
+}
+
+.toggle input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #ccc;
+  transition: 0.3s;
+  border-radius: 24px;
+}
+
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 18px;
+  width: 18px;
+  left: 3px;
+  bottom: 3px;
+  background-color: white;
+  transition: 0.3s;
+  border-radius: 50%;
+}
+
+.toggle input:checked + .slider {
+  background-color: #1877f2;
+}
+
+.toggle input:checked + .slider:before {
+  transform: translateX(20px);
+}
+
+:global(.dark) .cancel-btn {
+  background: #374151;
+  color: #e5e7eb;
+}
+
+:global(.dark) .cancel-btn:hover {
+  background: #4b5563;
 }
 </style>
