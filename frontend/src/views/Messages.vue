@@ -58,7 +58,7 @@
                       <span class="font-semibold text-gray-800 dark:text-gray-100">{{ conv.partnerName }}</span>
                       <span class="text-xs text-gray-400">{{ formatTime(conv.lastMessageTime) }}</span>
                     </div>
-                    <p :class="['text-sm truncate', conv.unread ? 'font-semibold text-gray-800' : 'text-gray-500']">
+                    <p :class="['text-sm truncate', conv.unread ? 'font-semibold text-gray-800 dark:text-gray-100' : 'text-gray-500 dark:text-gray-400']">
                       {{ conv.isFromMe ? 'You: ' : '' }}{{ conv.lastMessage }}
                     </p>
                   </div>
