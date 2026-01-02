@@ -67,13 +67,15 @@ const handleSubmit = async () => {
         }
 
         console.log('Creating post with imageUrl:', imageUrl);
-        await createPost({
+        const result = await createPost({
             content: content.value,
             imageUrl: imageUrl
         });
+        console.log('Post created:', result);
 
         content.value = '';
         clearFile();
+        console.log('Emitting post-created event');
         emit('post-created');
     } catch (e) {
         console.error("Failed to create post:", e);

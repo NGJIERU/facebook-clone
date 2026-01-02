@@ -8,6 +8,7 @@ import Profile from '../views/Profile.vue';
 import Messages from '../views/Messages.vue';
 import Groups from '../views/Groups.vue';
 import Events from '../views/Events.vue';
+import SavedPosts from '../views/SavedPosts.vue';
 
 const router = createRouter({
     history: createWebHistory(import.meta.env.BASE_URL),
@@ -56,6 +57,12 @@ const router = createRouter({
             path: '/events',
             name: 'events',
             component: Events,
+            meta: { requiresAuth: true }
+        },
+        {
+            path: '/saved',
+            name: 'saved',
+            component: SavedPosts,
             meta: { requiresAuth: true }
         }
     ]

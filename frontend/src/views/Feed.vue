@@ -56,6 +56,7 @@ const handleLogout = () => {
 };
 
 const handlePostCreated = () => {
+    console.log('handlePostCreated called, refetching feed...');
     refetch();
 };
 
@@ -79,6 +80,7 @@ const handlePostShared = () => {
           <button @click="router.push('/friends')" class="text-gray-600 dark:text-gray-300 hover:text-blue-600 font-medium">Friends</button>
           <button @click="router.push('/groups')" class="text-gray-600 dark:text-gray-300 hover:text-blue-600 font-medium">Groups</button>
           <button @click="router.push('/events')" class="text-gray-600 dark:text-gray-300 hover:text-blue-600 font-medium">Events</button>
+          <button @click="router.push('/saved')" class="text-gray-600 dark:text-gray-300 hover:text-blue-600 font-medium">🔖</button>
           <button @click="router.push('/messages')" class="text-gray-600 dark:text-gray-300 hover:text-blue-600 font-medium">💬</button>
           <NotificationDropdown />
           <ThemeToggle />

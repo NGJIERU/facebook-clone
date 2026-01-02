@@ -33,6 +33,7 @@ const sharing = ref(false);
 const originalAuthorName = ref(null);
 const originalAuthorPic = ref(null);
 const showLightbox = ref(false);
+const saved = ref(false);
 
 onMounted(async () => {
   // Fetch author profile (name and picture)
@@ -66,6 +67,14 @@ onMounted(async () => {
     likesCount.value = response.data.likesCount;
   } catch (e) {
     console.warn('Failed to fetch like status', e);
+  }
+
+  // Fetch saved status
+  try {
+    const response = await api.get(`/feed/saved/check/${props.post.id}`);
+    saved.value = response.data.saved;
+  } catch (e) {
+    console.warn('Failed to fetch saved status', e);
   }
 });
 
@@ -200,6 +209,20 @@ const sharePost = async () => {
 };
 
 const isSharedPost = computed(() => !!props.post.originalPostId);
+
+const toggleSave = async () => {
+  try {
+    if (saved.value) {
+      await api.delete(`/feed/saved/${props.post.id}`);
+      saved.value = false;
+    } else {
+      await api.post(`/feed/saved/${props.post.id}`);
+      saved.value = true;
+    }
+  } catch (e) {
+    console.error('Failed to toggle save', e);
+  }
+};
 </script>
 
 <template>
@@ -303,6 +326,13 @@ const isSharedPost = computed(() => !!props.post.originalPostId);
       >
         <span>↗️</span>
         <span>Share{{ sharesCount > 0 ? ` (${sharesCount})` : '' }}</span>
+      </button>
+      <button 
+        @click="toggleSave"
+        :class="['flex items-center gap-1 px-4 py-2 rounded hover:bg-gray-100 dark:hover:bg-gray-700 transition', saved ? 'text-yellow-600 font-semibold' : '']"
+      >
+        <span>{{ saved ? '🔖' : '🏷️' }}</span>
+        <span>{{ saved ? 'Saved' : 'Save' }}</span>
       </button>
     </div>
 
