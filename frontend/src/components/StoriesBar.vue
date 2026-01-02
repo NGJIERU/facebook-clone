@@ -240,32 +240,41 @@ const fetchStories = async () => {
   }
 };
 
+const authorInfo = ref({});
+
+const fetchAuthorInfo = async (authorId) => {
+  if (authorInfo.value[authorId]) return;
+  try {
+    const response = await api.get(`/users/profile/${authorId}`);
+    authorInfo.value[authorId] = {
+      name: response.data.username,
+      pic: response.data.profilePicUrl
+    };
+  } catch (e) {
+    authorInfo.value[authorId] = { name: 'Unknown', pic: null };
+  }
+};
+
 const groupedStories = computed(() => {
   const groups = {};
   stories.value.forEach(story => {
     if (!groups[story.authorId]) {
       groups[story.authorId] = {
         authorId: story.authorId,
-        authorName: null,
-        authorPic: null,
         stories: []
       };
+      // Trigger fetch for this author
+      fetchAuthorInfo(story.authorId);
     }
     groups[story.authorId].stories.push(story);
   });
   
-  // Fetch author info for each group
-  Object.values(groups).forEach(async (group) => {
-    try {
-      const response = await api.get(`/users/profile/${group.authorId}`);
-      group.authorName = response.data.username;
-      group.authorPic = response.data.profilePicUrl;
-    } catch (e) {
-      group.authorName = 'Unknown';
-    }
-  });
-  
-  return Object.values(groups);
+  // Map with author info from reactive ref
+  return Object.values(groups).map(group => ({
+    ...group,
+    authorName: authorInfo.value[group.authorId]?.name || null,
+    authorPic: authorInfo.value[group.authorId]?.pic || null
+  }));
 });
 
 const currentUserStories = computed(() => {
