@@ -107,18 +107,18 @@ const handlePostShared = () => {
         <CreatePost @post-created="handlePostCreated" />
 
         <!-- Feed Controls -->
-        <div class="bg-white rounded-lg shadow p-4 mb-6 flex items-center justify-between">
-            <span class="font-medium text-gray-700">Feed Filter</span>
+        <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-4 mb-6 flex items-center justify-between">
+            <span class="font-medium text-gray-700 dark:text-gray-300">Feed Filter</span>
             <div class="flex gap-2">
                 <button 
                     @click="showFriendsOnly = false"
-                    :class="['px-3 py-1 rounded-full text-sm font-medium transition', !showFriendsOnly ? 'bg-blue-600 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200']"
+                    :class="['px-3 py-1 rounded-full text-sm font-medium transition', !showFriendsOnly ? 'bg-blue-600 text-white' : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600']"
                 >
                     All Posts
                 </button>
                 <button 
                     @click="showFriendsOnly = true"
-                    :class="['px-3 py-1 rounded-full text-sm font-medium transition', showFriendsOnly ? 'bg-blue-600 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200']"
+                    :class="['px-3 py-1 rounded-full text-sm font-medium transition', showFriendsOnly ? 'bg-blue-600 text-white' : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600']"
                 >
                     Friends Only
                 </button>

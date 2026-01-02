@@ -1,19 +1,19 @@
 <template>
-  <div class="min-h-screen bg-gray-100">
+  <div class="min-h-screen bg-gray-100 dark:bg-gray-900">
     <!-- Navbar -->
-    <nav class="bg-white shadow sticky top-0 z-50">
+    <nav class="bg-white dark:bg-gray-800 shadow sticky top-0 z-50">
       <div class="container mx-auto px-4 h-16 flex justify-between items-center">
         <h1 class="text-2xl font-bold text-blue-600 cursor-pointer" @click="router.push('/')">Facebook</h1>
         <div class="flex items-center gap-6">
-          <button @click="router.push('/')" class="text-gray-600 hover:text-blue-600 font-medium">Home</button>
-          <button @click="router.push('/friends')" class="text-gray-600 hover:text-blue-600 font-medium">Friends</button>
+          <button @click="router.push('/')" class="text-gray-600 dark:text-gray-300 hover:text-blue-600 font-medium">Home</button>
+          <button @click="router.push('/friends')" class="text-gray-600 dark:text-gray-300 hover:text-blue-600 font-medium">Friends</button>
         </div>
       </div>
     </nav>
 
     <div class="container mx-auto px-4 py-8 max-w-4xl">
       <div class="flex justify-between items-center mb-6">
-        <h2 class="text-3xl font-bold text-gray-800">Groups</h2>
+        <h2 class="text-3xl font-bold text-gray-800 dark:text-gray-100">Groups</h2>
         <button 
           @click="showCreateModal = true"
           class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium"
@@ -26,13 +26,13 @@
       <div class="flex gap-4 mb-6">
         <button 
           @click="activeTab = 'discover'"
-          :class="['px-4 py-2 rounded-lg font-medium', activeTab === 'discover' ? 'bg-blue-600 text-white' : 'bg-white text-gray-600 hover:bg-gray-100']"
+          :class="['px-4 py-2 rounded-lg font-medium', activeTab === 'discover' ? 'bg-blue-600 text-white' : 'bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700']"
         >
           Discover
         </button>
         <button 
           @click="activeTab = 'my'"
-          :class="['px-4 py-2 rounded-lg font-medium', activeTab === 'my' ? 'bg-blue-600 text-white' : 'bg-white text-gray-600 hover:bg-gray-100']"
+          :class="['px-4 py-2 rounded-lg font-medium', activeTab === 'my' ? 'bg-blue-600 text-white' : 'bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700']"
         >
           My Groups
         </button>
@@ -45,7 +45,7 @@
           @input="handleSearch"
           type="text"
           placeholder="Search groups..."
-          class="w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+          class="w-full px-4 py-3 border dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-800 dark:text-gray-100 dark:placeholder-gray-400"
         />
       </div>
 
@@ -59,7 +59,7 @@
         <div 
           v-for="group in displayedGroups" 
           :key="group.id"
-          class="bg-white rounded-lg shadow overflow-hidden hover:shadow-lg transition cursor-pointer"
+          class="bg-white dark:bg-gray-800 rounded-lg shadow overflow-hidden hover:shadow-lg transition cursor-pointer"
           @click="viewGroup(group)"
         >
           <div 
@@ -67,9 +67,9 @@
             :style="group.coverImageUrl ? { backgroundImage: `url(${group.coverImageUrl})`, backgroundSize: 'cover' } : {}"
           ></div>
           <div class="p-4">
-            <h3 class="font-bold text-lg text-gray-800">{{ group.name }}</h3>
-            <p class="text-gray-500 text-sm mb-2">{{ group.membersCount }} members</p>
-            <p v-if="group.description" class="text-gray-600 text-sm line-clamp-2">{{ group.description }}</p>
+            <h3 class="font-bold text-lg text-gray-800 dark:text-gray-100">{{ group.name }}</h3>
+            <p class="text-gray-500 dark:text-gray-400 text-sm mb-2">{{ group.membersCount }} members</p>
+            <p v-if="group.description" class="text-gray-600 dark:text-gray-400 text-sm line-clamp-2">{{ group.description }}</p>
             <div class="mt-3 flex gap-2">
               <span v-if="group.public" class="text-xs bg-green-100 text-green-700 px-2 py-1 rounded">Public</span>
               <span v-else class="text-xs bg-gray-100 text-gray-700 px-2 py-1 rounded">Private</span>
@@ -79,19 +79,19 @@
       </div>
 
       <!-- Empty State -->
-      <div v-if="!loading && displayedGroups.length === 0" class="text-center py-10 text-gray-500">
+      <div v-if="!loading && displayedGroups.length === 0" class="text-center py-10 text-gray-500 dark:text-gray-400">
         {{ activeTab === 'my' ? "You haven't joined any groups yet." : "No groups found." }}
       </div>
     </div>
 
     <!-- Create Group Modal -->
     <div v-if="showCreateModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50" @click="showCreateModal = false">
-      <div class="bg-white rounded-lg p-6 w-full max-w-md mx-4" @click.stop>
-        <h3 class="text-xl font-bold mb-4">Create New Group</h3>
+      <div class="bg-white dark:bg-gray-800 rounded-lg p-6 w-full max-w-md mx-4" @click.stop>
+        <h3 class="text-xl font-bold mb-4 dark:text-gray-100">Create New Group</h3>
         
         <div class="space-y-4">
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">Group Name *</label>
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Group Name *</label>
             <input 
               v-model="newGroup.name"
               type="text"

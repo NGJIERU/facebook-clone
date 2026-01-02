@@ -1,19 +1,19 @@
 <template>
-  <div class="min-h-screen bg-gray-100">
+  <div class="min-h-screen bg-gray-100 dark:bg-gray-900">
     <!-- Navbar -->
-    <nav class="bg-white shadow sticky top-0 z-50">
+    <nav class="bg-white dark:bg-gray-800 shadow sticky top-0 z-50">
       <div class="container mx-auto px-4 h-16 flex justify-between items-center">
         <h1 class="text-2xl font-bold text-blue-600 cursor-pointer" @click="router.push('/')">Facebook</h1>
         <div class="flex items-center gap-6">
-          <button @click="router.push('/')" class="text-gray-600 hover:text-blue-600 font-medium">Home</button>
-          <button @click="router.push('/friends')" class="text-gray-600 hover:text-blue-600 font-medium">Friends</button>
+          <button @click="router.push('/')" class="text-gray-600 dark:text-gray-300 hover:text-blue-600 font-medium">Home</button>
+          <button @click="router.push('/friends')" class="text-gray-600 dark:text-gray-300 hover:text-blue-600 font-medium">Friends</button>
         </div>
       </div>
     </nav>
 
     <div class="container mx-auto px-4 py-8 max-w-4xl">
       <div class="flex justify-between items-center mb-6">
-        <h2 class="text-3xl font-bold text-gray-800">Events</h2>
+        <h2 class="text-3xl font-bold text-gray-800 dark:text-gray-100">Events</h2>
         <button 
           @click="showCreateModal = true"
           class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium"
@@ -26,13 +26,13 @@
       <div class="flex gap-4 mb-6">
         <button 
           @click="activeTab = 'upcoming'"
-          :class="['px-4 py-2 rounded-lg font-medium', activeTab === 'upcoming' ? 'bg-blue-600 text-white' : 'bg-white text-gray-600 hover:bg-gray-100']"
+          :class="['px-4 py-2 rounded-lg font-medium', activeTab === 'upcoming' ? 'bg-blue-600 text-white' : 'bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700']"
         >
           Upcoming
         </button>
         <button 
           @click="activeTab = 'my'"
-          :class="['px-4 py-2 rounded-lg font-medium', activeTab === 'my' ? 'bg-blue-600 text-white' : 'bg-white text-gray-600 hover:bg-gray-100']"
+          :class="['px-4 py-2 rounded-lg font-medium', activeTab === 'my' ? 'bg-blue-600 text-white' : 'bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700']"
         >
           My Events
         </button>
@@ -48,7 +48,7 @@
         <div 
           v-for="event in displayedEvents" 
           :key="event.id"
-          class="bg-white rounded-lg shadow overflow-hidden hover:shadow-lg transition cursor-pointer"
+          class="bg-white dark:bg-gray-800 rounded-lg shadow overflow-hidden hover:shadow-lg transition cursor-pointer"
           @click="viewEvent(event)"
         >
           <div class="flex">
@@ -58,9 +58,9 @@
             ></div>
             <div class="p-4 flex-1">
               <div class="text-sm text-purple-600 font-medium mb-1">{{ formatEventDate(event.eventDate) }}</div>
-              <h3 class="font-bold text-lg text-gray-800 mb-1">{{ event.title }}</h3>
-              <p v-if="event.location" class="text-gray-500 text-sm mb-2">📍 {{ event.location }}</p>
-              <div class="flex gap-4 text-sm text-gray-500">
+              <h3 class="font-bold text-lg text-gray-800 dark:text-gray-100 mb-1">{{ event.title }}</h3>
+              <p v-if="event.location" class="text-gray-500 dark:text-gray-400 text-sm mb-2">📍 {{ event.location }}</p>
+              <div class="flex gap-4 text-sm text-gray-500 dark:text-gray-400">
                 <span>{{ event.attendeesCount }} going</span>
                 <span>{{ event.interestedCount }} interested</span>
               </div>
@@ -70,14 +70,14 @@
       </div>
 
       <!-- Empty State -->
-      <div v-if="!loading && displayedEvents.length === 0" class="text-center py-10 text-gray-500">
+      <div v-if="!loading && displayedEvents.length === 0" class="text-center py-10 text-gray-500 dark:text-gray-400">
         {{ activeTab === 'my' ? "You haven't RSVP'd to any events yet." : "No upcoming events." }}
       </div>
     </div>
 
     <!-- Create Event Modal -->
     <div v-if="showCreateModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50" @click="showCreateModal = false">
-      <div class="bg-white rounded-lg p-6 w-full max-w-md mx-4 max-h-[90vh] overflow-y-auto" @click.stop>
+      <div class="bg-white dark:bg-gray-800 rounded-lg p-6 w-full max-w-md mx-4 max-h-[90vh] overflow-y-auto" @click.stop>
         <h3 class="text-xl font-bold mb-4">Create New Event</h3>
         
         <div class="space-y-4">
