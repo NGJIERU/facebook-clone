@@ -7,7 +7,7 @@ spring:
 
   threads:
     virtual:
-      enabled: true
+      enabled: false
   
   datasource:
     url: jdbc:postgresql://localhost:5432/user_db

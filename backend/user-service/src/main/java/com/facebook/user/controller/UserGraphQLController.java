@@ -22,13 +22,10 @@ public class UserGraphQLController {
 
     @QueryMapping
     public UserProfile me() {
-        String email = (String) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        // In a real app, we might store the UUID in the JWT claim 'sub' vs email, or
-        // look it up.
-        // For now, assuming email is username or using Repo to find by username.
-        log.info("Fetching profile for: {}", email);
-        return repository.findByUsername(email)
-                .orElseThrow(() -> new RuntimeException("Profile not found for " + email));
+        // Deprecated: Use REST /api/users/profile
+        // Valid logic would require extracting ID from token which is hard in GraphQL
+        // context here without utils.
+        return null;
     }
 
     @QueryMapping

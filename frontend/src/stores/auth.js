@@ -16,9 +16,17 @@ export const useAuthStore = defineStore('auth', {
                 const { token } = response.data;
 
                 this.token = token;
-                this.user = { username: email }; // Temporary: use email as username until backend returns profile
-
                 localStorage.setItem('token', token);
+
+                // Fetch full profile
+                try {
+                    const profileRes = await api.get('/users/profile');
+                    this.user = profileRes.data;
+                } catch (e) {
+                    console.warn('Failed to fetch profile', e);
+                    this.user = { username: email }; // Fallback
+                }
+
                 localStorage.setItem('user', JSON.stringify(this.user));
 
                 return { success: true };

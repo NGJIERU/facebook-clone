@@ -34,15 +34,16 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             return;
         }
         jwt = authHeader.substring(7);
-        userEmail = jwtService.extractUsername(jwt);
-        // Stateless validation: verification happens in jwtService.extractUsername
-        // (signature check implied)
-        // Check expiration explicitly
+        System.out.println("DEBUG JWT: Starting extraction");
+        String userId = jwtService.extractClaim(jwt, claims -> claims.get("userId", String.class));
+        System.out.println("DEBUG JWT: Extracted userId = " + userId);
+
+        // Stateless validation: verification happens in jwtService
         // We TRUST the token claims here. No DB calls.
-        if (userEmail != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-            if (jwtService.isTokenValid(jwt, userEmail)) {
+        if (userId != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+            if (!jwtService.isTokenExpired(jwt)) {
                 UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
-                        userEmail, // Principle is the email/username
+                        userId, // Principle is the userId
                         null,
                         Collections.emptyList() // We can extract roles from JWT if needed later
                 );

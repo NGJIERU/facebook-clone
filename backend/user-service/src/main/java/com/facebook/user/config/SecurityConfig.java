@@ -23,8 +23,9 @@ public class SecurityConfig {
         http
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/graphiql/**", "/graphql/**").permitAll() // Secure internally via Resolver or
-                                                                                    // let Context handle it
+                        .requestMatchers("/graphiql/**", "/graphql/**").permitAll()
+                        .requestMatchers("/api/users/search").permitAll()
+                        .requestMatchers("/api/users/**", "/api/friends/**").authenticated()
                         .anyRequest().authenticated())
                 .sessionManagement(sess -> sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);

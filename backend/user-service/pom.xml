@@ -14,7 +14,7 @@
 	<name>user-service</name>
 	<description>User Service for Distributed Social Media Platform</description>
 	<properties>
-		<java.version>21</java.version>
+		<java.version>17</java.version>
 	</properties>
 	<dependencies>
 		<!-- web -->

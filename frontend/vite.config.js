@@ -21,6 +21,14 @@ export default defineConfig({
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/api\/feed/, ''),
       },
+      '/api/friends': {
+        target: 'http://localhost:8081',
+        changeOrigin: true,
+      },
+      '/api/users': {
+        target: 'http://localhost:8081',
+        changeOrigin: true,
+      },
       '/api/media': {
         target: 'http://localhost:8085',
         changeOrigin: true,

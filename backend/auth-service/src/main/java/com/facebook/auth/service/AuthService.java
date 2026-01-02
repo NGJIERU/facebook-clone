@@ -34,7 +34,9 @@ public class AuthService {
                                 .provider(AuthProvider.LOCAL)
                                 .build();
                 repository.save(user);
-                var jwtToken = jwtService.generateToken(user);
+                java.util.Map<String, Object> claims = new java.util.HashMap<>();
+                claims.put("userId", user.getId());
+                var jwtToken = jwtService.generateToken(claims, user);
                 return AuthResponse.builder()
                                 .token(jwtToken)
                                 .build();
@@ -47,7 +49,9 @@ public class AuthService {
                                                 request.getPassword()));
                 var user = repository.findByEmail(request.getEmail())
                                 .orElseThrow();
-                var jwtToken = jwtService.generateToken(user);
+                java.util.Map<String, Object> claims = new java.util.HashMap<>();
+                claims.put("userId", user.getId());
+                var jwtToken = jwtService.generateToken(claims, user);
                 return AuthResponse.builder()
                                 .token(jwtToken)
                                 .build();

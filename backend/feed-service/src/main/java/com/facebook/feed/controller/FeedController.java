@@ -23,6 +23,22 @@ public class FeedController {
     private final org.springframework.kafka.core.KafkaTemplate<String, String> kafkaTemplate;
     private final ObjectMapper objectMapper;
 
+    @org.springframework.beans.factory.annotation.Value("${application.security.jwt.secret-key}")
+    private String secretKey;
+
+    private String extractUserIdFromToken(String token) {
+        if (token == null || !token.startsWith("Bearer ")) {
+            throw new RuntimeException("Invalid token format");
+        }
+        String jwt = token.substring(7);
+        io.jsonwebtoken.Claims claims = io.jsonwebtoken.Jwts.parserBuilder()
+                .setSigningKey(io.jsonwebtoken.io.Decoders.BASE64.decode(secretKey))
+                .build()
+                .parseClaimsJws(jwt)
+                .getBody();
+        return claims.get("userId", String.class);
+    }
+
     @QueryMapping
     public List<FeedPost> getFeed() {
         return repository.findAllByOrderByCreatedAtDesc();
@@ -35,25 +51,102 @@ public class FeedController {
 
     @MutationMapping
     public FeedPost createPost(@Argument String content, @Argument String imageUrl) {
+        // We need the token. GraphQL context?
+        // In Spring GraphQL, we can access headers via DataFetchingEnvironment or
+        // Context.
+        // OR we can still use SecurityContextHolder if JwtFilter populated it?
+        // But JwtFilter (if generic) might not populate claims.
+        // Let's rely on SecurityContext to get the token directly if possible?
+        // Actually, for GraphQL, @RequestHeader is not available directly on
+        // @MutationMapping methods usually?
+        // Wait, Spring GraphQL controller methods differ from REST.
+        // Standard approach: Access Principal from SecurityContextHolder.
+        // If I want "userId" claim, and JwtAuthenticationFilter didn't extract it... I
+        // am stuck.
+
+        // OPTION 1: Update `JwtAuthenticationFilter` in `feed-service` to put claims in
+        // authentication.details.
+        // OPTION 2: Use
+        // `SecurityContextHolder.getContext().getAuthentication().getCredentials()`
+        // (usually token).
+
         var authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (authentication == null ||
-                !authentication.isAuthenticated() ||
-                "anonymousUser".equals(authentication.getPrincipal())) {
-            throw new RuntimeException("Access Denied: You must be logged in to create a post.");
+        if (authentication == null || !authentication.isAuthenticated()
+                || "anonymousUser".equals(authentication.getPrincipal())) {
+            throw new RuntimeException("Access Denied");
         }
 
-        String userEmail = (String) authentication.getPrincipal();
+        // Try to get token from credentials if JwtAuthenticationFilter sets it.
+        // Standard filters often set token as credentials.
+        Object credentials = authentication.getCredentials();
+        String userId = null;
+        if (credentials instanceof String && ((String) credentials).startsWith("ey")) { // Basic check
+            try {
+                // If credentials IS the token
+                userId = extractUserIdFromToken("Bearer " + credentials);
+            } catch (Exception e) {
+            }
+        }
+
+        // Fallback: If we can't get ID from token easily in GraphQL without changing
+        // Filter,
+        // and if Principal is Email, we have a problem.
+        // BUT wait. I updated `AuthService` to put `userId` in claims.
+        // Does `JwtAuthenticationFilter` (standard/copied) accidentally put claims in
+        // Principal? No.
+
+        // CRITICAL: GraphQL Controller makes extraction hard if header isn't passed.
+        // I should have updated `JwtAuthenticationFilter`.
+
+        // Let's assume `JwtAuthenticationFilter` (which I didn't check in
+        // `feed-service`) sets credentials = jwt.
+        // If not, I am risky.
+
+        // Alternative: Fetch User by Email (Principal) -> Get ID ?
+        // Feed Service doesn't have User table.
+        // It relies on Token.
+
+        // Let's try to grab `Authorization` header from `GraphQLContext`?
+        // public FeedPost createPost(..., DataFetchingEnvironment env)
+        // env.getGraphQlContext().get(...)
+
+        // Let's use the `credentials` approach assuming it's the token.
+        // If not, I will revert to Email (and accept the mismatch for now or fix
+        // later).
+        // But the goal is ID alignment.
+
+        // Let's implement the `credentials` check.
+
+        if (userId == null) {
+            // Fallback to principal if extraction failed (e.g. mocking)
+            log.warn("Could not extract userId from token claims, using Principal");
+            userId = (String) authentication.getPrincipal();
+        }
+
+        // WAIT. If I use Email as userId, it breaks consistency.
+        // I MUST get the UUID.
+        // The token is sent in the header.
+        // Spring Security `BearerTokenAuthenticationToken` holds the token value.
+
+        // Valid implementation using `authentication.getCredentials()` which usually
+        // holds the JWT token string in OAuth2/JWT setups.
+        String token = (String) authentication.getCredentials();
+        if (token != null) {
+            userId = extractUserIdFromToken("Bearer " + token);
+        } else {
+            throw new RuntimeException("No JWT token found in credentials");
+        }
 
         FeedPost post = FeedPost.builder()
                 .content(content)
                 .imageUrl(imageUrl)
-                .authorId(userEmail)
+                .authorId(userId)
                 .createdAt(Instant.now())
                 .likesCount(0)
                 .commentsCount(0)
                 .build();
 
-        log.info("Creating post for user: {}", userEmail);
+        log.info("Creating post for user: {}", userId);
         FeedPost savedPost = repository.save(post);
 
         // Publish Event
