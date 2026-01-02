@@ -11,7 +11,7 @@ import java.util.UUID;
 @Repository
 public interface GroupRepository extends JpaRepository<Group, UUID> {
 
-    List<Group> findByIsPublicTrueOrderByMembersCountDesc();
+    List<Group> findByPublicGroupTrueOrderByMembersCountDesc();
 
     @Query("SELECT g FROM Group g WHERE LOWER(g.name) LIKE LOWER(CONCAT('%', :query, '%'))")
     List<Group> searchByName(String query);

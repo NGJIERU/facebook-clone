@@ -37,5 +37,14 @@ public class Group {
 
     private int membersCount;
 
-    private boolean isPublic;
+    @Column(name = "is_public")
+    private boolean publicGroup;
+    
+    public boolean isPublic() {
+        return publicGroup;
+    }
+    
+    public void setPublic(boolean isPublic) {
+        this.publicGroup = isPublic;
+    }
 }

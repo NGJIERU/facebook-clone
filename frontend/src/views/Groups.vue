@@ -71,7 +71,7 @@
             <p class="text-gray-500 text-sm mb-2">{{ group.membersCount }} members</p>
             <p v-if="group.description" class="text-gray-600 text-sm line-clamp-2">{{ group.description }}</p>
             <div class="mt-3 flex gap-2">
-              <span v-if="group.isPublic" class="text-xs bg-green-100 text-green-700 px-2 py-1 rounded">Public</span>
+              <span v-if="group.public" class="text-xs bg-green-100 text-green-700 px-2 py-1 rounded">Public</span>
               <span v-else class="text-xs bg-gray-100 text-gray-700 px-2 py-1 rounded">Private</span>
             </div>
           </div>
@@ -163,7 +163,7 @@
           <p v-if="selectedGroup.description" class="text-gray-600 mb-4">{{ selectedGroup.description }}</p>
           
           <div class="flex gap-2">
-            <span v-if="selectedGroup.isPublic" class="text-sm bg-green-100 text-green-700 px-3 py-1 rounded">Public</span>
+            <span v-if="selectedGroup.public" class="text-sm bg-green-100 text-green-700 px-3 py-1 rounded">Public</span>
             <span v-else class="text-sm bg-gray-100 text-gray-700 px-3 py-1 rounded">Private</span>
           </div>
         </div>

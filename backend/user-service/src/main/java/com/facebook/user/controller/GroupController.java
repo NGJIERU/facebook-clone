@@ -51,7 +51,7 @@ public class GroupController {
                 .creatorId(currentUserId)
                 .createdAt(Instant.now())
                 .membersCount(1)
-                .isPublic(isPublic)
+                .publicGroup(isPublic)
                 .build();
 
         Group saved = groupRepository.save(group);
@@ -71,7 +71,7 @@ public class GroupController {
 
     @GetMapping
     public ResponseEntity<List<Group>> getPublicGroups() {
-        return ResponseEntity.ok(groupRepository.findByIsPublicTrueOrderByMembersCountDesc());
+        return ResponseEntity.ok(groupRepository.findByPublicGroupTrueOrderByMembersCountDesc());
     }
 
     @GetMapping("/my")

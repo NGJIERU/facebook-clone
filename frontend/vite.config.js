@@ -19,6 +19,18 @@ export default defineConfig({
         target: 'http://localhost:8081',
         changeOrigin: true,
       },
+      '/api/groups': {
+        target: 'http://localhost:8081',
+        changeOrigin: true,
+      },
+      '/api/events': {
+        target: 'http://localhost:8081',
+        changeOrigin: true,
+      },
+      '/api/messages': {
+        target: 'http://localhost:8081',
+        changeOrigin: true,
+      },
       '/api/feed/graphql': {
         target: 'http://localhost:8082',
         changeOrigin: true,
