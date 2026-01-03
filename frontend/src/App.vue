@@ -49,7 +49,7 @@ const showNavBar = () => {
             </svg>
         </div>
         <div>
-           <div class="font-bold text-sm">{{ notification.senderId === 'SYSTEM' ? 'Notification' : notification.senderId }}</div>
+           <div class="font-bold text-sm">{{ notification.senderName || (notification.senderId === 'SYSTEM' ? 'Notification' : notification.senderId) }}</div>
            <div class="text-sm">{{ notification.message }}</div>
         </div>
     </div>

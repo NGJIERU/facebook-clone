@@ -38,9 +38,16 @@
                 ]"
               >
                 <div class="flex items-center gap-3">
-                  <div class="w-12 h-12 rounded-full overflow-hidden bg-blue-100 flex items-center justify-center flex-shrink-0">
-                    <img v-if="conv.partnerPic" :src="conv.partnerPic" class="w-full h-full object-cover" />
-                    <span v-else class="text-blue-600 font-bold">{{ conv.partnerName?.charAt(0)?.toUpperCase() }}</span>
+                  <div class="relative w-12 h-12 flex-shrink-0">
+                    <div class="w-full h-full rounded-full overflow-hidden bg-blue-100 flex items-center justify-center">
+                      <img v-if="conv.partnerPic" :src="conv.partnerPic" class="w-full h-full object-cover" />
+                      <img v-if="conv.partnerPic" :src="conv.partnerPic" class="w-full h-full object-cover" />
+                      <span v-else class="text-blue-600 font-bold">{{ conv.partnerName?.charAt(0)?.toUpperCase() }}</span>
+                    </div>
+                    <!-- Green Dot (Online) -->
+                    <div v-if="onlineUsers.has(conv.partnerId)" class="absolute bottom-0 right-0 w-4 h-4 bg-green-500 border-2 border-white rounded-full"></div>
+                    <!-- Red Dot (Offline) -->
+                    <div v-else class="absolute bottom-0 right-0 w-4 h-4 bg-red-500 border-2 border-white rounded-full"></div>
                   </div>
                   <div class="flex-1 min-w-0">
                     <div class="flex justify-between items-center">
@@ -192,11 +199,25 @@ const sending = ref(false);
 const showNewMessageModal = ref(false);
 const messagesContainer = ref(null);
 const stompClient = ref(null);
+const onlineUsers = ref(new Set());
 
 onMounted(async () => {
   await fetchConversations();
   friendStore.fetchFriends();
+  await fetchConversations();
+  friendStore.fetchFriends();
+  await fetchOnlineUsers();
+  await fetchOnlineUsers();
   connectWebSocket();
+});
+
+import { onBeforeUnmount } from 'vue';
+
+onBeforeUnmount(() => {
+    if (stompClient.value) {
+        stompClient.value.deactivate();
+        console.log('Disconnected from WebSocket');
+    }
 });
 
 const connectWebSocket = () => {
@@ -234,6 +255,16 @@ const subscribeToChat = () => {
     stompClient.value.subscribe(`/topic/chat/${authStore.user.id}`, (message) => {
         const chatEvent = JSON.parse(message.body);
         handleIncomingMessage(chatEvent);
+    });
+
+    // Subscribe to presence
+    stompClient.value.subscribe('/topic/presence', (message) => {
+        const presence = JSON.parse(message.body);
+        if (presence.online) {
+            onlineUsers.value.add(presence.userId);
+        } else {
+            onlineUsers.value.delete(presence.userId);
+        }
     });
 };
 
@@ -339,5 +370,16 @@ const formatTime = (dateString) => {
   if (hours < 24) return `${hours}h`;
   if (days < 7) return `${days}d`;
   return date.toLocaleDateString();
+};
+
+
+const fetchOnlineUsers = async () => {
+    try {
+        // Note: This endpoint must exist in Gateway routing
+        const response = await api.get('/notifications/presence');
+        onlineUsers.value = new Set(response.data);
+    } catch (e) {
+        console.error('Failed to fetch online users', e);
+    }
 };
 </script>

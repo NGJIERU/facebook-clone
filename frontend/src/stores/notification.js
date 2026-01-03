@@ -38,9 +38,22 @@ export const useNotificationStore = defineStore('notification', () => {
                 console.log('Connected to WebSocket');
 
                 // Subscribe to user specific notifications
-                client.value.subscribe(`/topic/notifications/${recipientId}`, (message) => {
+                client.value.subscribe(`/topic/notifications/${recipientId}`, async (message) => {
                     const notification = JSON.parse(message.body);
                     console.log("Received notification:", notification);
+
+                    // Resolve sender name
+                    if (notification.senderId && notification.senderId !== 'SYSTEM') {
+                        try {
+                            // Check if we already have it in a simple cache or just fetch
+                            const response = await api.get(`/users/profile/${notification.senderId}`);
+                            notification.senderName = response.data.username;
+                        } catch (e) {
+                            notification.senderName = 'Unknown User';
+                        }
+                    } else {
+                        notification.senderName = 'System';
+                    }
 
                     // Add to toasts
                     notifications.value.unshift(notification);
