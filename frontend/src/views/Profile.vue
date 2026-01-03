@@ -1,18 +1,5 @@
 <template>
   <div class="min-h-screen bg-gray-100 dark:bg-gray-900">
-    <!-- Navbar -->
-    <nav class="bg-white dark:bg-gray-800 shadow sticky top-0 z-50">
-      <div class="container mx-auto px-4 h-16 flex justify-between items-center">
-        <h1 class="text-2xl font-bold text-blue-600 cursor-pointer" @click="router.push('/')">Facebook</h1>
-        
-        <div class="flex items-center gap-6">
-          <button @click="router.push('/')" class="text-gray-600 dark:text-gray-300 hover:text-blue-600 font-medium">Home</button>
-          <button @click="router.push('/friends')" class="text-gray-600 dark:text-gray-300 hover:text-blue-600 font-medium">Friends</button>
-          <button @click="handleLogout" class="text-gray-500 dark:text-gray-400 hover:text-red-600 transition font-medium text-sm">Logout</button>
-        </div>
-      </div>
-    </nav>
-
     <!-- Profile Content -->
     <div class="profile-container">
       <!-- Loading State -->
@@ -62,22 +49,22 @@
         </div>
 
         <!-- Settings Section for own profile -->
-        <div v-if="isOwnProfile" class="settings-section bg-gray-800">
-          <h3 class="text-white">Quick Settings</h3>
+        <div v-if="isOwnProfile" class="settings-section bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700">
+          <h3 class="text-gray-900 dark:text-white">Quick Settings</h3>
           <div class="settings-grid">
-            <div class="setting-item bg-gray-700 text-gray-200 hover:bg-gray-600" @click="router.push('/saved')">
+            <div class="setting-item bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-600" @click="router.push('/saved')">
               <span class="setting-icon">🔖</span>
               <span>Saved Posts</span>
             </div>
-            <div class="setting-item bg-gray-700 text-gray-200 hover:bg-gray-600" @click="router.push('/friends')">
+            <div class="setting-item bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-600" @click="router.push('/friends')">
               <span class="setting-icon">👥</span>
               <span>Friends</span>
             </div>
-            <div class="setting-item bg-gray-700 text-gray-200 hover:bg-gray-600" @click="router.push('/groups')">
+            <div class="setting-item bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-600" @click="router.push('/groups')">
               <span class="setting-icon">👨‍👩‍👧‍👦</span>
               <span>Groups</span>
             </div>
-            <div class="setting-item bg-gray-700 text-gray-200 hover:bg-gray-600" @click="router.push('/events')">
+            <div class="setting-item bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-600" @click="router.push('/events')">
               <span class="setting-icon">📅</span>
               <span>Events</span>
             </div>

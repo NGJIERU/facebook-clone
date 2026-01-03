@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class AuthController {
 
     private final AuthService service;
+    private final com.facebook.auth.service.OAuthService oauthService;
 
     @PostMapping("/register")
     public ResponseEntity<AuthResponse> register(
@@ -28,5 +29,48 @@ public class AuthController {
     public ResponseEntity<AuthResponse> login(
             @RequestBody LoginRequest request) {
         return ResponseEntity.ok(service.login(request));
+    }
+
+    @org.springframework.web.bind.annotation.GetMapping("/oauth2/authorize/{provider}")
+    public void authorize(
+            @org.springframework.web.bind.annotation.PathVariable String provider,
+            jakarta.servlet.http.HttpServletResponse response) throws java.io.IOException {
+        String url = oauthService.getAuthorizationUrl(provider);
+        response.sendRedirect(url);
+    }
+
+    @org.springframework.beans.factory.annotation.Value("${application.frontend-url}")
+    private String frontendUrl;
+
+    @org.springframework.web.bind.annotation.GetMapping("/oauth2/callback/{provider}")
+    public void callback(
+            @org.springframework.web.bind.annotation.PathVariable String provider,
+            @org.springframework.web.bind.annotation.RequestParam(required = false) String code,
+            @org.springframework.web.bind.annotation.RequestParam(required = false) String error,
+            jakarta.servlet.http.HttpServletResponse response) throws java.io.IOException {
+
+        if (error != null) {
+            response.sendRedirect(frontendUrl + "/login?error=" + error);
+            return;
+        }
+        if (code == null) {
+            response.sendRedirect(frontendUrl + "/login?error=no_code");
+            return;
+        }
+
+        try {
+            AuthResponse authResponse = oauthService.processCallback(provider, code);
+            String redirectUrl = frontendUrl + "/login?token=" + authResponse.getToken() +
+                    "&refreshToken=" + authResponse.getRefreshToken();
+            response.sendRedirect(redirectUrl);
+        } catch (Exception e) {
+            response.sendRedirect(frontendUrl + "/login?error="
+                    + java.net.URLEncoder.encode(e.getMessage(), java.nio.charset.StandardCharsets.UTF_8));
+        }
+    }
+
+    @PostMapping("/refresh-token")
+    public ResponseEntity<?> refreshToken(@RequestBody com.facebook.auth.dto.RefreshTokenRequest request) {
+        return ResponseEntity.ok(service.refreshToken(request));
     }
 }

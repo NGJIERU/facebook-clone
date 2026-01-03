@@ -121,20 +121,20 @@ const handleClickOutside = (e) => {
 
 <template>
   <div class="search-container relative" @click.stop>
-    <div class="search-input-wrapper bg-gray-700">
-      <span class="search-icon">🔍</span>
+    <div class="search-input-wrapper bg-gray-100 dark:bg-gray-700">
+      <span class="search-icon text-gray-500 dark:text-gray-400">🔍</span>
       <input 
         v-model="searchQuery"
         type="text"
         placeholder="Search Facebook..."
-        class="search-input text-white placeholder-gray-400"
+        class="search-input text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400"
         @focus="searchQuery.trim() && (showResults = true)"
       />
       <button v-if="searchQuery" @click="closeSearch" class="clear-btn">✕</button>
     </div>
     
     <!-- Search Results Dropdown -->
-    <div v-if="showResults" class="search-results bg-gray-800 border border-gray-700" @click.stop>
+    <div v-if="showResults" class="search-results bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700" @click.stop>
       <!-- Loading -->
       <div v-if="loading" class="search-loading">
         <div class="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600 mx-auto"></div>
@@ -146,51 +146,51 @@ const handleClickOutside = (e) => {
           v-for="(item, index) in unifiedResults" 
           :key="`${item.type}-${item.data.id || index}`"
           @click="item.type === 'user' ? goToUser(item.data.id) : item.type === 'group' ? goToGroup(item.data.id) : item.type === 'event' ? goToEvent(item.data.id) : router.push('/')"
-          class="result-item hover:bg-gray-700"
+          class="result-item hover:bg-gray-100 dark:hover:bg-gray-700"
         >
           <!-- User Result -->
           <template v-if="item.type === 'user'">
-            <div class="result-avatar bg-gray-600 text-gray-200">
+            <div class="result-avatar bg-gray-200 dark:bg-gray-600 text-gray-600 dark:text-gray-200">
               <img v-if="item.data.profilePicUrl" :src="item.data.profilePicUrl" class="w-full h-full object-cover rounded-full" />
               <span v-else>{{ item.data.username?.charAt(0)?.toUpperCase() }}</span>
             </div>
             <div class="result-info">
-              <span class="result-name text-white">{{ item.data.username }}</span>
-              <span class="result-type text-gray-400">Person</span>
+              <span class="result-name text-gray-900 dark:text-white">{{ item.data.username }}</span>
+              <span class="result-type text-gray-500 dark:text-gray-400">Person</span>
             </div>
           </template>
           
           <!-- Group Result -->
           <template v-else-if="item.type === 'group'">
-            <div class="result-avatar bg-blue-900 text-blue-400">👥</div>
+            <div class="result-avatar bg-blue-100 dark:bg-blue-900 text-blue-600 dark:text-blue-400">👥</div>
             <div class="result-info">
-              <span class="result-name text-white">{{ item.data.name }}</span>
-              <span class="result-type text-gray-400">Group · {{ item.data.memberCount || 0 }} members</span>
+              <span class="result-name text-gray-900 dark:text-white">{{ item.data.name }}</span>
+              <span class="result-type text-gray-500 dark:text-gray-400">Group · {{ item.data.memberCount || 0 }} members</span>
             </div>
           </template>
           
           <!-- Event Result -->
           <template v-else-if="item.type === 'event'">
-            <div class="result-avatar bg-purple-900 text-purple-400">📅</div>
+            <div class="result-avatar bg-purple-100 dark:bg-purple-900 text-purple-600 dark:text-purple-400">📅</div>
             <div class="result-info">
-              <span class="result-name text-white">{{ item.data.title }}</span>
-              <span class="result-type text-gray-400">Event</span>
+              <span class="result-name text-gray-900 dark:text-white">{{ item.data.title }}</span>
+              <span class="result-type text-gray-500 dark:text-gray-400">Event</span>
             </div>
           </template>
           
           <!-- Post Result -->
           <template v-else-if="item.type === 'post'">
-            <div class="result-avatar bg-green-900 text-green-400">📝</div>
+            <div class="result-avatar bg-green-100 dark:bg-green-900 text-green-600 dark:text-green-400">📝</div>
             <div class="result-info">
-              <span class="result-name text-white">{{ item.data.content?.substring(0, 50) }}{{ item.data.content?.length > 50 ? '...' : '' }}</span>
-              <span class="result-type text-gray-400">Post</span>
+              <span class="result-name text-gray-900 dark:text-white">{{ item.data.content?.substring(0, 50) }}{{ item.data.content?.length > 50 ? '...' : '' }}</span>
+              <span class="result-type text-gray-500 dark:text-gray-400">Post</span>
             </div>
           </template>
         </div>
       </div>
       
       <!-- No Results -->
-      <div v-else-if="searchQuery.trim() && !loading" class="no-results text-gray-400">
+      <div v-else-if="searchQuery.trim() && !loading" class="no-results text-gray-500 dark:text-gray-400">
         <p>No results found for "{{ searchQuery }}"</p>
       </div>
     </div>

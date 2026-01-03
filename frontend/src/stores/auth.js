@@ -59,6 +59,24 @@ export const useAuthStore = defineStore('auth', {
         updateUser(userData) {
             this.user = userData;
             localStorage.setItem('user', JSON.stringify(userData));
+        },
+        setToken(token) {
+            this.token = token;
+            localStorage.setItem('token', token);
+        },
+        setRefreshToken(refreshToken) {
+            // Store refresh token? State definition above only has 'token'. 
+            // I should add refreshToken to state if needed, or just localStorage.
+            localStorage.setItem('refreshToken', refreshToken);
+        },
+        async fetchUser() {
+            try {
+                const profileRes = await api.get('/users/profile');
+                this.user = profileRes.data;
+                localStorage.setItem('user', JSON.stringify(this.user));
+            } catch (e) {
+                console.warn('Failed to fetch profile', e);
+            }
         }
     }
 });

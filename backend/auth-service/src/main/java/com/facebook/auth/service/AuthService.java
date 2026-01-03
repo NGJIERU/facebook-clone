@@ -22,6 +22,7 @@ public class AuthService {
         private final PasswordEncoder passwordEncoder;
         private final JwtService jwtService;
         private final AuthenticationManager authenticationManager;
+        private final RefreshTokenService refreshTokenService;
 
         public AuthResponse register(RegisterRequest request) {
                 if (repository.findByEmail(request.getEmail()).isPresent()) {
@@ -37,8 +38,10 @@ public class AuthService {
                 java.util.Map<String, Object> claims = new java.util.HashMap<>();
                 claims.put("userId", user.getId().toString());
                 var jwtToken = jwtService.generateToken(claims, user);
+                var refreshToken = refreshTokenService.createRefreshToken(user.getEmail());
                 return AuthResponse.builder()
                                 .token(jwtToken)
+                                .refreshToken(refreshToken.getToken())
                                 .build();
         }
 
@@ -52,8 +55,27 @@ public class AuthService {
                 java.util.Map<String, Object> claims = new java.util.HashMap<>();
                 claims.put("userId", user.getId().toString());
                 var jwtToken = jwtService.generateToken(claims, user);
+                var refreshToken = refreshTokenService.createRefreshToken(user.getEmail());
                 return AuthResponse.builder()
                                 .token(jwtToken)
+                                .refreshToken(refreshToken.getToken())
                                 .build();
+        }
+
+        public com.facebook.auth.dto.TokenRefreshResponse refreshToken(
+                        com.facebook.auth.dto.RefreshTokenRequest request) {
+                return refreshTokenService.findByToken(request.getRefreshToken())
+                                .map(refreshTokenService::verifyExpiration)
+                                .map(com.facebook.auth.model.RefreshToken::getUser)
+                                .map(user -> {
+                                        java.util.Map<String, Object> claims = new java.util.HashMap<>();
+                                        claims.put("userId", user.getId().toString());
+                                        String accessToken = jwtService.generateToken(claims, user);
+                                        return com.facebook.auth.dto.TokenRefreshResponse.builder()
+                                                        .accessToken(accessToken)
+                                                        .refreshToken(request.getRefreshToken())
+                                                        .build();
+                                })
+                                .orElseThrow(() -> new RuntimeException("Refresh token is not in database!"));
         }
 }

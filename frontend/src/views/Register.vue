@@ -21,33 +21,33 @@ const handleRegister = async () => {
 </script>
 
 <template>
-  <div class="flex items-center justify-center min-h-screen bg-gray-100">
-    <div class="px-8 py-6 mt-4 text-left bg-white shadow-lg rounded-lg w-full max-w-sm">
-      <h3 class="text-2xl font-bold text-center">Create an account</h3>
+  <div class="flex items-center justify-center min-h-screen bg-gray-100 dark:bg-gray-900">
+    <div class="px-8 py-6 mt-4 text-left bg-white dark:bg-gray-800 shadow-lg rounded-lg w-full max-w-sm">
+      <h3 class="text-2xl font-bold text-center text-gray-900 dark:text-white">Create an account</h3>
       <form @submit.prevent="handleRegister">
         <div class="mt-4">
           <div>
-            <label class="block" for="username">Username</label>
+            <label class="block text-gray-700 dark:text-gray-300" for="username">Username</label>
             <input type="text" placeholder="Username" id="username"
-              class="w-full px-4 py-2 mt-2 border rounded-md focus:outline-none focus:ring-1 focus:ring-blue-600"
+              class="w-full px-4 py-2 mt-2 border rounded-md focus:outline-none focus:ring-1 focus:ring-blue-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white border-gray-300 dark:border-gray-600"
               v-model="username" @input="error = ''" required />
           </div>
           <div class="mt-4">
-            <label class="block" for="email">Email</label>
+            <label class="block text-gray-700 dark:text-gray-300" for="email">Email</label>
             <input type="email" placeholder="Email" id="email"
-              class="w-full px-4 py-2 mt-2 border rounded-md focus:outline-none focus:ring-1 focus:ring-blue-600"
+              class="w-full px-4 py-2 mt-2 border rounded-md focus:outline-none focus:ring-1 focus:ring-blue-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white border-gray-300 dark:border-gray-600"
               v-model="email" @input="error = ''" required />
           </div>
           <div class="mt-4">
-            <label class="block" for="password">Password</label>
+            <label class="block text-gray-700 dark:text-gray-300" for="password">Password</label>
             <input type="password" placeholder="Password" id="password"
-              class="w-full px-4 py-2 mt-2 border rounded-md focus:outline-none focus:ring-1 focus:ring-blue-600"
+              class="w-full px-4 py-2 mt-2 border rounded-md focus:outline-none focus:ring-1 focus:ring-blue-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white border-gray-300 dark:border-gray-600"
               v-model="password" @input="error = ''" required />
           </div>
           <p v-if="error" class="text-red-500 text-sm mt-2">{{ error }}</p>
           <div class="flex items-baseline justify-between">
-            <button class="px-6 py-2 mt-4 text-white bg-blue-600 rounded-lg hover:bg-blue-900">Register</button>
-            <router-link to="/login" class="text-sm text-blue-600 hover:underline">Login</router-link>
+            <button class="px-6 py-2 mt-4 text-white bg-blue-600 rounded-lg hover:bg-blue-900 transition duration-200">Register</button>
+            <router-link to="/login" class="text-sm text-blue-600 hover:underline dark:text-blue-400">Login</router-link>
           </div>
         </div>
       </form>
