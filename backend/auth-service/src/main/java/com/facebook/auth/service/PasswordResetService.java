@@ -1,11 +1,13 @@
 package com.facebook.auth.service;
 
+import com.facebook.auth.dto.PasswordResetEvent;
 import com.facebook.auth.model.PasswordResetToken;
 import com.facebook.auth.model.User;
 import com.facebook.auth.repository.PasswordResetTokenRepository;
 import com.facebook.auth.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -19,7 +21,7 @@ public class PasswordResetService {
 
     private final PasswordResetTokenRepository tokenRepository;
     private final UserRepository userRepository;
-    private final EmailService emailService;
+    private final KafkaTemplate<String, PasswordResetEvent> kafkaTemplate;
     private final PasswordEncoder passwordEncoder;
 
     @Value("${application.frontend-url}")
@@ -40,12 +42,12 @@ public class PasswordResetService {
                     .build();
             tokenRepository.save(myToken);
 
-            // Send email
-            String resetUrl = frontendUrl + "/reset-password?token=" + token;
-            String subject = "Reset Password";
-            String text = "To reset your password, click the link below:\n" + resetUrl;
-
-            emailService.sendSimpleMessage(user.getEmail(), subject, text);
+            // Publish event to Kafka
+            PasswordResetEvent event = new PasswordResetEvent(
+                    user.getEmail(),
+                    user.getUsername() != null ? user.getUsername() : user.getEmail(),
+                    token);
+            kafkaTemplate.send("password-reset-topic", event);
         });
         // If user not found, we typically don't reveal it to prevent enumeration,
         // so we return normally or log internally.

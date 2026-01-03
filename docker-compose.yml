@@ -71,6 +71,16 @@ services:
     networks:
       - facebook-network
 
+  # 📧 Email Server (Mock SMTP)
+  mailhog:
+    image: mailhog/mailhog
+    container_name: facebook-mailhog
+    ports:
+      - "1025:1025" # SMTP server
+      - "8025:8025" # Web UI
+    networks:
+      - facebook-network
+
   # 🖼️ Create default bucket in MinIO
   minio-create-bucket:
     image: minio/mc
@@ -99,6 +109,8 @@ services:
       SPRING_DATA_REDIS_HOST: redis
       SPRING_DATA_REDIS_PORT: 6379
       APPLICATION_SECURITY_JWT_SECRET_KEY: 404E635266556A586E3272357538782F413F4428472B4B6250645367566B5970
+      SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:29092
+      SPRING_KAFKA_PRODUCER_VALUE_SERIALIZER: org.springframework.kafka.support.serializer.JsonSerializer
       GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID}
       GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET}
       FACEBOOK_CLIENT_ID: ${FACEBOOK_CLIENT_ID}
@@ -106,6 +118,7 @@ services:
     depends_on:
       - postgres
       - redis
+      - kafka
     networks:
       - facebook-network
 
@@ -180,10 +193,13 @@ services:
       SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:29092
       SPRING_DATA_REDIS_HOST: redis
       SPRING_DATA_REDIS_PORT: 6379
+      SPRING_MAIL_HOST: mailhog
+      SPRING_MAIL_PORT: 1025
       APPLICATION_SECURITY_JWT_SECRET_KEY: 404E635266556A586E3272357538782F413F4428472B4B6250645367566B5970
     depends_on:
       - postgres
       - kafka
+      - mailhog
     networks:
       - facebook-network
 

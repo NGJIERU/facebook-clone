@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <title>You have a new message</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            color: #333;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+
+        .button {
+            display: inline-block;
+            padding: 10px 20px;
+            background-color: #1877f2;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+        }
+
+        .message-preview {
+            background-color: #f0f2f5;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+            font-style: italic;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h2>Hi <span th:text="${username}">User</span>,</h2>
+        <p><strong th:text="${senderName}">Friend</strong> sent you a message while you were away:</p>
+
+        <div class="message-preview">
+            "<span th:text="${messageContent}">Hello there!</span>"
+        </div>
+
+        <p>
+            <a th:href="${chatLink}" class="button">Reply Now</a>
+        </p>
+    </div>
+</body>
+
+</html>
