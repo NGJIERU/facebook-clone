@@ -24,6 +24,7 @@ public class MediaServiceImpl implements MediaService {
 
     private final MinioClient minioClient;
     private final MediaRepository mediaRepository;
+    private final com.facebook.media.service.ImageProcessingService imageProcessingService;
 
     @Value("${application.minio.bucket}")
     private String bucketName;
@@ -65,9 +66,11 @@ public class MediaServiceImpl implements MediaService {
             extension = originalFileName.substring(originalFileName.lastIndexOf("."));
         }
 
-        String fileName = UUID.randomUUID().toString() + extension;
+        String baseFileName = UUID.randomUUID().toString();
+        String fileName = baseFileName + extension;
 
         try {
+            // Upload original file
             InputStream inputStream = file.getInputStream();
             minioClient.putObject(
                     PutObjectArgs.builder()
@@ -78,24 +81,69 @@ public class MediaServiceImpl implements MediaService {
                             .build());
 
             // Construct direct URL using PUBLIC URL
-            // Format: http://public-host:9000/bucket-name/filename
             String url = String.format("%s/%s/%s", publicUrl, bucketName, fileName);
 
-            Media media = Media.builder()
+            // Build media object
+            Media.MediaBuilder mediaBuilder = Media.builder()
                     .userId(userId)
                     .fileName(fileName)
                     .originalFileName(originalFileName)
                     .contentType(contentType)
                     .size(size)
-                    .url(url)
-                    .build();
+                    .url(url);
 
+            // If image, generate and upload variants
+            if (contentType != null && contentType.startsWith("image/")) {
+                log.info("Generating image variants for: {}", originalFileName);
+
+                try {
+                    java.util.Map<String, InputStream> variants = imageProcessingService.generateImageVariants(file);
+
+                    // Upload thumbnail
+                    if (variants.containsKey("thumbnail")) {
+                        String thumbnailName = baseFileName + "_thumbnail" + extension;
+                        uploadVariant(variants.get("thumbnail"), thumbnailName, contentType);
+                        mediaBuilder.thumbnailUrl(String.format("%s/%s/%s", publicUrl, bucketName, thumbnailName));
+                    }
+
+                    // Upload small
+                    if (variants.containsKey("small")) {
+                        String smallName = baseFileName + "_small" + extension;
+                        uploadVariant(variants.get("small"), smallName, contentType);
+                        mediaBuilder.smallUrl(String.format("%s/%s/%s", publicUrl, bucketName, smallName));
+                    }
+
+                    // Upload medium
+                    if (variants.containsKey("medium")) {
+                        String mediumName = baseFileName + "_medium" + extension;
+                        uploadVariant(variants.get("medium"), mediumName, contentType);
+                        mediaBuilder.mediumUrl(String.format("%s/%s/%s", publicUrl, bucketName, mediumName));
+                    }
+
+                    log.info("Successfully generated {} variants for {}", variants.size() - 1, originalFileName);
+                } catch (Exception e) {
+                    log.warn("Failed to generate image variants, continuing with original only", e);
+                }
+            }
+
+            Media media = mediaBuilder.build();
             return mediaRepository.save(media);
 
         } catch (Exception e) {
             log.error("Error uploading file to MinIO", e);
             throw new RuntimeException("Failed to upload file", e);
         }
+    }
+
+    private void uploadVariant(InputStream stream, String fileName, String contentType) throws Exception {
+        byte[] bytes = stream.readAllBytes();
+        minioClient.putObject(
+                PutObjectArgs.builder()
+                        .bucket(bucketName)
+                        .object(fileName)
+                        .stream(new java.io.ByteArrayInputStream(bytes), bytes.length, -1)
+                        .contentType(contentType)
+                        .build());
     }
 
     @Override

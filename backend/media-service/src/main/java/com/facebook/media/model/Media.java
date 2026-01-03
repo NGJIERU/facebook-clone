@@ -39,6 +39,11 @@ public class Media {
     @Column(nullable = false)
     private String url;
 
+    // Image variant URLs (generated for images only)
+    private String thumbnailUrl;
+    private String smallUrl;
+    private String mediumUrl;
+
     @CreationTimestamp
     private LocalDateTime createdAt;
 }
