@@ -252,7 +252,9 @@ const connectWebSocket = () => {
 const subscribeToChat = () => {
     if (!stompClient.value || !authStore.user?.id) return;
     
+    console.log('🔌 Subscribing to chat for user:', authStore.user.id);
     stompClient.value.subscribe(`/topic/chat/${authStore.user.id}`, (message) => {
+        console.log('📩 Raw WebSocket message received:', message.body);
         const chatEvent = JSON.parse(message.body);
         handleIncomingMessage(chatEvent);
     });
@@ -260,6 +262,7 @@ const subscribeToChat = () => {
     // Subscribe to presence
     stompClient.value.subscribe('/topic/presence', (message) => {
         const presence = JSON.parse(message.body);
+        console.log('👻 Presence update:', presence);
         if (presence.online) {
             onlineUsers.value.add(presence.userId);
         } else {
@@ -269,20 +272,31 @@ const subscribeToChat = () => {
 };
 
 const handleIncomingMessage = async (msg) => {
+    console.log('📨 Incoming WebSocket message:', msg);
+    console.log('👤 Currently viewing chat with:', selectedPartnerId.value);
+    console.log('📧 Message sender ID:', msg.senderId);
+    console.log('📧 Message receiver ID:', msg.receiverId);
+    console.log('✅ Should show?', selectedPartnerId.value === msg.senderId || selectedPartnerId.value === msg.receiverId);
+    
     // If we are currently chatting with the sender, append the message
     if (selectedPartnerId.value === msg.senderId) {
+        console.log('✅ Adding message from sender to chat');
         messages.value.push(msg);
         await nextTick();
         scrollToBottom();
     } 
     // If it's a message we sent (via another device), append it if currently viewing chat
     else if (selectedPartnerId.value === msg.receiverId) {
+         console.log('✅ Adding message we sent to chat');
          messages.value.push(msg);
          await nextTick();
          scrollToBottom();
+    } else {
+        console.log('❌ Message not for current chat, skipping');
     }
 
     // Refresh conversations list to update "last message" and "unread" status
+    console.log('🔄 Refreshing conversations list');
     await fetchConversations();
 };
 

@@ -107,35 +107,35 @@
           <form @submit.prevent="saveProfile">
             <!-- Profile Picture -->
             <div class="form-group">
-              <label class="dark:text-gray-200">Profile Picture</label>
+              <label class="dark:text-white">Profile Picture</label>
               <div class="flex items-center gap-4">
                 <div class="w-16 h-16 rounded-full overflow-hidden bg-blue-500 flex items-center justify-center">
                   <img v-if="editForm.profilePicUrl" :src="editForm.profilePicUrl" class="w-full h-full object-cover" />
                   <span v-else class="text-white text-2xl font-bold">{{ editForm.username?.charAt(0)?.toUpperCase() }}</span>
                 </div>
                 <input type="file" ref="modalProfilePicInput" @change="handleModalProfilePic" accept="image/*" class="hidden" />
-                <button type="button" @click="$refs.modalProfilePicInput.click()" class="px-3 py-1 bg-gray-200 rounded text-sm hover:bg-gray-300">
+                <button type="button" @click="$refs.modalProfilePicInput.click()" class="px-3 py-1 bg-gray-200 dark:bg-gray-600 rounded text-sm hover:bg-gray-300 dark:hover:bg-gray-500 text-gray-800 dark:text-gray-100 font-medium">
                   {{ uploadingModalPic ? 'Uploading...' : 'Change Photo' }}
                 </button>
               </div>
             </div>
             <!-- Cover Picture -->
             <div class="form-group">
-              <label class="dark:text-gray-200">Cover Photo</label>
+              <label class="dark:text-white">Cover Photo</label>
               <div class="w-full h-20 rounded overflow-hidden bg-gradient-to-r from-blue-500 to-purple-500">
                 <img v-if="editForm.coverPicUrl" :src="editForm.coverPicUrl" class="w-full h-full object-cover" />
               </div>
               <input type="file" ref="modalCoverPicInput" @change="handleModalCoverPic" accept="image/*" class="hidden" />
-              <button type="button" @click="$refs.modalCoverPicInput.click()" class="mt-2 px-3 py-1 bg-gray-200 rounded text-sm hover:bg-gray-300">
+              <button type="button" @click="$refs.modalCoverPicInput.click()" class="mt-2 px-3 py-1 bg-gray-200 dark:bg-gray-600 rounded text-sm hover:bg-gray-300 dark:hover:bg-gray-500 text-gray-800 dark:text-gray-100 font-medium">
                 {{ uploadingModalCover ? 'Uploading...' : 'Change Cover' }}
               </button>
             </div>
             <div class="form-group">
-              <label class="dark:text-gray-200">Username</label>
+              <label class="dark:text-white">Username</label>
               <input v-model="editForm.username" type="text" required class="dark:bg-gray-700 dark:border-gray-600 dark:text-white">
             </div>
             <div class="form-group">
-              <label class="dark:text-gray-200">Bio</label>
+              <label class="dark:text-white">Bio</label>
               <textarea v-model="editForm.bio" rows="4" class="dark:bg-gray-700 dark:border-gray-600 dark:text-white"></textarea>
             </div>
             <div class="form-actions">
@@ -626,7 +626,7 @@ onMounted(async () => {
 }
 
 .form-group {
-  margin-bottom: 16px;
+  margin-bottom: 20px;
 }
 
 .form-group label {
@@ -634,10 +634,11 @@ onMounted(async () => {
   margin-bottom: 8px;
   font-weight: 600;
   color: #1c1e21;
+  font-size: 15px;
 }
 
 :global(.dark) .form-group label {
-  color: #e5e7eb;
+  color: #ffffff !important;
 }
 
 .form-group input,
@@ -776,10 +777,11 @@ onMounted(async () => {
   color: #65676b;
   text-transform: uppercase;
   letter-spacing: 0.5px;
+  font-weight: 600;
 }
 
 :global(.dark) .settings-category h4 {
-  color: #9ca3af;
+  color: #d1d5db;
 }
 
 .settings-category.danger h4 {
@@ -790,12 +792,14 @@ onMounted(async () => {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 12px;
+  padding: 14px 16px;
   background: #f0f2f5;
   border-radius: 8px;
   margin-bottom: 8px;
   cursor: pointer;
   transition: background 0.2s;
+  font-weight: 500;
+  color: #1c1e21;
 }
 
 .setting-row:hover {
@@ -804,7 +808,12 @@ onMounted(async () => {
 
 :global(.dark) .setting-row {
   background: #374151;
-  color: #e5e7eb;
+  color: #f3f4f6;
+  border: 1px solid #4b5563;
+}
+
+:global(.dark) .setting-row:hover {
+  background: #4b5563;
 }
 
 :global(.dark) .setting-row:hover {
