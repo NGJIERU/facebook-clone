@@ -267,8 +267,9 @@ const toggleSave = async () => {
           <img v-if="originalAuthorPic" :src="originalAuthorPic" class="w-full h-full object-cover" />
           <span v-else class="text-gray-600 font-bold text-sm">{{ originalAuthorName?.charAt(0)?.toUpperCase() || 'U' }}</span>
         </div>
-        <span class="font-medium text-sm text-gray-700">{{ originalAuthorName || 'Unknown User' }}</span>
+        <span class="font-medium text-sm text-gray-700 dark:text-gray-300">{{ originalAuthorName || 'Unknown User' }}</span>
       </div>
+      <p v-if="post.originalContent" class="text-gray-800 dark:text-gray-200 mb-2">{{ post.originalContent }}</p>
       <div v-if="post.imageUrl && !imageError">
         <img 
           :src="post.imageUrl" 
@@ -342,16 +343,33 @@ const toggleSave = async () => {
         <h3 class="text-xl font-bold mb-4">Share this post</h3>
         
         <!-- Original Post Preview -->
-        <div class="bg-gray-50 rounded-lg p-4 mb-4 border">
-          <div class="flex items-center gap-2 mb-2">
-            <div class="w-8 h-8 rounded-full overflow-hidden bg-gray-300 flex items-center justify-center">
+        <!-- Original Post Preview -->
+        <div class="border rounded-xl mb-4 overflow-hidden bg-white dark:bg-gray-700 shadow-sm">
+          <!-- Author Header -->
+          <div class="p-3 flex items-center gap-3 border-b dark:border-gray-600 bg-gray-50 dark:bg-gray-800">
+            <div class="w-10 h-10 rounded-full overflow-hidden bg-gray-200 flex-shrink-0">
               <img v-if="authorProfilePic" :src="authorProfilePic" class="w-full h-full object-cover" />
-              <span v-else class="text-gray-600 font-bold text-sm">{{ displayName?.charAt(0)?.toUpperCase() }}</span>
+              <div v-else class="w-full h-full flex items-center justify-center text-gray-500 font-bold">
+                {{ displayName?.charAt(0)?.toUpperCase() }}
+              </div>
             </div>
-            <span class="font-medium text-sm">{{ displayName }}</span>
+            <div>
+              <div class="font-semibold text-sm text-gray-900 dark:text-gray-100">{{ displayName }}</div>
+              <div class="text-xs text-gray-500">{{ formattedDate }}</div>
+            </div>
           </div>
-          <p class="text-gray-700 text-sm">{{ post.content }}</p>
-          <img v-if="post.imageUrl" :src="post.imageUrl" class="mt-2 rounded max-h-32 object-cover" />
+
+          <!-- Content -->
+          <div class="p-3">
+            <p v-if="post.content" class="text-gray-800 dark:text-gray-200 text-sm mb-3">{{ post.content }}</p>
+            
+            <!-- Shared Media -->
+            <img 
+              v-if="post.imageUrl" 
+              :src="post.imageUrl" 
+              class="w-full rounded-lg object-cover max-h-60" 
+            />
+          </div>
         </div>
 
         <!-- Share Comment -->

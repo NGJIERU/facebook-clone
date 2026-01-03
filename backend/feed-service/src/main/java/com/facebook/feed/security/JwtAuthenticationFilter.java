@@ -39,7 +39,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             if (jwtService.isTokenValid(jwt, userEmail)) {
                 UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
                         userEmail,
-                        jwt,  // Store JWT token in credentials so FeedController can extract userId
+                        jwt, // Store JWT token in credentials so FeedController can extract userId
                         Collections.emptyList());
                 authToken.setDetails(
                         new WebAuthenticationDetailsSource().buildDetails(request));

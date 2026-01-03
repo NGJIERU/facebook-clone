@@ -178,7 +178,8 @@ public class FeedController {
     @org.springframework.web.bind.annotation.GetMapping("/api/feed/search")
     public org.springframework.http.ResponseEntity<List<FeedPost>> searchPosts(
             @org.springframework.web.bind.annotation.RequestParam String q) {
-        return org.springframework.http.ResponseEntity.ok(repository.findByContentContainingIgnoreCaseOrderByCreatedAtDesc(q));
+        return org.springframework.http.ResponseEntity
+                .ok(repository.findByContentContainingIgnoreCaseOrderByCreatedAtDesc(q));
     }
 
     @org.springframework.web.bind.annotation.DeleteMapping("/api/feed/posts/{postId}")
@@ -205,7 +206,8 @@ public class FeedController {
         return repository.findById(postId)
                 .map(post -> {
                     if (!post.getAuthorId().equals(currentUserId)) {
-                        return org.springframework.http.ResponseEntity.status(403).body("You can only delete your own posts");
+                        return org.springframework.http.ResponseEntity.status(403)
+                                .body("You can only delete your own posts");
                     }
                     repository.delete(post);
                     log.info("Deleted post {} by user {}", postId, currentUserId);
@@ -239,7 +241,7 @@ public class FeedController {
         return repository.findById(postId)
                 .map(originalPost -> {
                     String shareComment = (body != null) ? body.get("comment") : null;
-                    
+
                     FeedPost sharedPost = FeedPost.builder()
                             .authorId(currentUserId)
                             .content(shareComment)
@@ -247,17 +249,18 @@ public class FeedController {
                             .createdAt(java.time.Instant.now())
                             .originalPostId(originalPost.getId())
                             .originalAuthorId(originalPost.getAuthorId())
+                            .originalContent(originalPost.getContent())
                             .likesCount(0)
                             .commentsCount(0)
                             .sharesCount(0)
                             .build();
-                    
+
                     FeedPost saved = repository.save(sharedPost);
-                    
+
                     // Increment share count on original post
                     originalPost.setSharesCount(originalPost.getSharesCount() + 1);
                     repository.save(originalPost);
-                    
+
                     log.info("User {} shared post {}", currentUserId, postId);
                     return org.springframework.http.ResponseEntity.ok(saved);
                 })

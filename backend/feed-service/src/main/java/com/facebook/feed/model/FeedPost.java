@@ -39,4 +39,7 @@ public class FeedPost {
     // For shared posts - references the original post
     private UUID originalPostId;
     private String originalAuthorId;
+
+    @Column(columnDefinition = "TEXT")
+    private String originalContent;
 }

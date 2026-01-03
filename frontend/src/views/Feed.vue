@@ -30,6 +30,9 @@ const GET_FEED_QUERY = gql`
       authorId
       createdAt
       imageUrl
+      originalContent
+      originalPostId
+      originalAuthorId
     }
   }
 `;

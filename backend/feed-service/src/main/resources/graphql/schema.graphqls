@@ -9,6 +9,7 @@ type FeedPost {
     sharesCount: Int
     originalPostId: ID
     originalAuthorId: String
+    originalContent: String
 }
 
 type Query {

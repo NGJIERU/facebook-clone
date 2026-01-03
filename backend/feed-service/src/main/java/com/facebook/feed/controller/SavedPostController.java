@@ -48,7 +48,7 @@ public class SavedPostController {
     @PostMapping("/{postId}")
     public ResponseEntity<?> savePost(@PathVariable String postId) {
         String userId = getCurrentUserId();
-        
+
         if (savedPostRepository.existsByUserIdAndPostId(userId, postId)) {
             return ResponseEntity.badRequest().body(Map.of("error", "Post already saved"));
         }
@@ -57,7 +57,7 @@ public class SavedPostController {
                 .userId(userId)
                 .postId(postId)
                 .build();
-        
+
         savedPostRepository.save(savedPost);
         return ResponseEntity.ok(Map.of("message", "Post saved successfully"));
     }
@@ -76,7 +76,7 @@ public class SavedPostController {
         List<UUID> postIds = savedPosts.stream()
                 .map(sp -> UUID.fromString(sp.getPostId()))
                 .collect(Collectors.toList());
-        
+
         List<FeedPost> posts = feedPostRepository.findAllById(postIds);
         return ResponseEntity.ok(posts);
     }
