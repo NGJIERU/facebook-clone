@@ -126,7 +126,7 @@ const formatDate = (dateString) => {
                 :key="notification.id"
                 @click="handleMarkAsRead(notification)"
                 class="px-4 py-3 border-b border-gray-100 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer transition flex gap-3 items-start"
-                :class="{ 'bg-blue-50': !notification.read }"
+                :class="{ 'bg-blue-50 dark:bg-blue-900/20': !notification.read }"
             >
                 <div class="flex-shrink-0 mt-1 text-blue-500">
                      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
