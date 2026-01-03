@@ -102,7 +102,7 @@
 
       <!-- Edit Profile Modal -->
       <div v-if="showEditModal" class="modal-overlay" @click="showEditModal = false">
-        <div class="modal-content dark:bg-gray-800" @click.stop>
+        <div class="modal-content bg-white dark:bg-gray-800" @click.stop>
           <h2 class="dark:text-white">Edit Profile</h2>
           <form @submit.prevent="saveProfile">
             <!-- Profile Picture -->
