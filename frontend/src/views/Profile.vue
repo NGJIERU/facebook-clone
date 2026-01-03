@@ -653,8 +653,8 @@ onMounted(async () => {
 
 :global(.dark) .form-group input,
 :global(.dark) .form-group textarea {
-  background: #374151;
-  border-color: #4b5563;
+  background: #111827;
+  border-color: #374151;
   color: #f3f4f6;
 }
 

@@ -48,11 +48,9 @@ spring:
     consumer:
       group-id: notification-group
       auto-offset-reset: earliest
-      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
       properties:
         spring.json.trusted.packages: '*'
-        spring.json.use.type.headers: false
-        spring.json.value.default.type: com.facebook.notification.dto.PasswordResetEvent
 
 logging:
   level:

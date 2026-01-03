@@ -203,10 +203,7 @@ const onlineUsers = ref(new Set());
 
 onMounted(async () => {
   await fetchConversations();
-  friendStore.fetchFriends();
-  await fetchConversations();
-  friendStore.fetchFriends();
-  await fetchOnlineUsers();
+  await friendStore.fetchFriends();
   await fetchOnlineUsers();
   connectWebSocket();
 });
@@ -317,6 +314,8 @@ const selectConversation = async (conv) => {
   selectedPartnerName.value = conv.partnerName;
   selectedPartnerPic.value = conv.partnerPic;
   await fetchMessages();
+  // Refresh conversations to update unread status (remove blue dot)
+  await fetchConversations();
 };
 
 const startConversation = async (friend) => {
@@ -333,7 +332,6 @@ const fetchMessages = async () => {
   try {
     const response = await api.get(`/messages/conversation/${selectedPartnerId.value}`);
     messages.value = response.data;
-    await nextTick();
     scrollToBottom();
   } catch (e) {
     console.error('Failed to fetch messages', e);
@@ -353,7 +351,6 @@ const sendMessage = async () => {
     });
     messages.value.push(response.data);
     newMessage.value = '';
-    await nextTick();
     scrollToBottom();
     await fetchConversations();
   } catch (e) {
@@ -364,9 +361,17 @@ const sendMessage = async () => {
   }
 };
 
-const scrollToBottom = () => {
+const scrollToBottom = async () => {
+  await nextTick();
   if (messagesContainer.value) {
     messagesContainer.value.scrollTop = messagesContainer.value.scrollHeight;
+    
+    // Double check scaling or image load delay
+    setTimeout(() => {
+        if (messagesContainer.value) {
+            messagesContainer.value.scrollTop = messagesContainer.value.scrollHeight;
+        }
+    }, 100);
   }
 };
 

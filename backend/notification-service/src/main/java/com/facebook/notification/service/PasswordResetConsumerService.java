@@ -13,9 +13,16 @@ public class PasswordResetConsumerService {
 
     private final EmailService emailService;
 
+    private final com.fasterxml.jackson.databind.ObjectMapper objectMapper;
+
     @KafkaListener(topics = "password-reset-topic", groupId = "notification-group")
-    public void consumePasswordResetEvent(PasswordResetEvent event) {
-        log.info("Received password reset event for email: {}", event.email());
-        emailService.sendPasswordResetEmail(event.email(), event.username(), event.resetToken());
+    public void consumePasswordResetEvent(String eventJson) {
+        try {
+            PasswordResetEvent event = objectMapper.readValue(eventJson, PasswordResetEvent.class);
+            log.info("Received password reset event for email: {}", event.email());
+            emailService.sendPasswordResetEmail(event.email(), event.username(), event.resetToken());
+        } catch (Exception e) {
+            log.error("Failed to process password reset event", e);
+        }
     }
 }
