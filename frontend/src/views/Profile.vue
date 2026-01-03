@@ -39,10 +39,10 @@
               <p class="bio text-gray-500 dark:text-gray-400">{{ profile.bio || 'No bio yet' }}</p>
             </div>
             
-            <button v-if="isOwnProfile" @click="showEditModal = true" class="edit-button bg-blue-600 text-white hover:bg-blue-700 px-4 py-2 rounded-md font-semibold">
+            <button v-if="isOwnProfile" @click="showEditModal = true" class="edit-button absolute top-4 right-6 bg-blue-600 text-white hover:bg-blue-700 px-4 py-2 rounded-md font-semibold transition-colors">
               Edit Profile
             </button>
-            <button v-if="isOwnProfile" @click="showSettingsModal = true" class="settings-button bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-gray-100 hover:bg-gray-300 dark:hover:bg-gray-600 px-4 py-2 rounded-md font-semibold">
+            <button v-if="isOwnProfile" @click="showSettingsModal = true" class="settings-button absolute top-16 right-6 bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-gray-100 hover:bg-gray-300 dark:hover:bg-gray-600 px-4 py-2 rounded-md font-semibold transition-colors">
               ⚙️ Settings
             </button>
           </div>
@@ -154,11 +154,11 @@
           <div class="settings-list">
             <div class="settings-category">
               <h4 class="text-gray-500 dark:text-gray-400 text-sm font-semibold uppercase tracking-wide mb-2">Account</h4>
-              <div class="setting-row bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-900 dark:text-gray-100" @click="showEditModal = true; showSettingsModal = false">
+              <div class="setting-row flex justify-between items-center p-3 rounded-lg mb-2 cursor-pointer transition-colors bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-900 dark:text-gray-100" @click="showEditModal = true; showSettingsModal = false">
                 <span>✏️ Edit Profile</span>
                 <span class="arrow text-gray-400">›</span>
               </div>
-              <div class="setting-row bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-900 dark:text-gray-100" @click="router.push('/saved'); showSettingsModal = false">
+              <div class="setting-row flex justify-between items-center p-3 rounded-lg mb-2 cursor-pointer transition-colors bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-900 dark:text-gray-100" @click="router.push('/saved'); showSettingsModal = false">
                 <span>🔖 Saved Posts</span>
                 <span class="arrow text-gray-400">›</span>
               </div>
@@ -166,11 +166,11 @@
             
             <div class="settings-category">
               <h4 class="text-gray-500 dark:text-gray-400 text-sm font-semibold uppercase tracking-wide mb-2">Privacy</h4>
-              <div class="setting-row bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-900 dark:text-gray-100">
+              <div class="setting-row flex justify-between items-center p-3 rounded-lg mb-2 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-900 dark:text-gray-100">
                 <span>🔒 Profile Visibility</span>
                 <span class="setting-value text-gray-500 dark:text-gray-400 text-sm">Public</span>
               </div>
-              <div class="setting-row bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-900 dark:text-gray-100">
+              <div class="setting-row flex justify-between items-center p-3 rounded-lg mb-2 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-900 dark:text-gray-100">
                 <span>👁️ Who can see my posts</span>
                 <span class="setting-value text-gray-500 dark:text-gray-400 text-sm">Everyone</span>
               </div>
@@ -178,14 +178,14 @@
             
             <div class="settings-category">
               <h4 class="text-gray-500 dark:text-gray-400 text-sm font-semibold uppercase tracking-wide mb-2">Notifications</h4>
-              <div class="setting-row bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-900 dark:text-gray-100">
+              <div class="setting-row flex justify-between items-center p-3 rounded-lg mb-2 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-900 dark:text-gray-100">
                 <span>🔔 Push Notifications</span>
                 <label class="toggle">
                   <input type="checkbox" checked>
                   <span class="slider bg-gray-300 dark:bg-gray-600"></span>
                 </label>
               </div>
-              <div class="setting-row bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-900 dark:text-gray-100">
+              <div class="setting-row flex justify-between items-center p-3 rounded-lg mb-2 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-900 dark:text-gray-100">
                 <span>📧 Email Notifications</span>
                 <label class="toggle">
                   <input type="checkbox">
@@ -196,7 +196,7 @@
             
             <div class="settings-category danger">
               <h4 class="text-red-600 dark:text-red-400 text-sm font-semibold uppercase tracking-wide mb-2">Danger Zone</h4>
-              <div class="setting-row danger bg-red-50 dark:bg-red-900/20 hover:bg-red-100 dark:hover:bg-red-900/40 text-red-600 dark:text-red-400" @click="handleLogout">
+              <div class="setting-row danger flex justify-between items-center p-3 rounded-lg mb-2 cursor-pointer transition-colors bg-red-50 dark:bg-red-900/20 hover:bg-red-100 dark:hover:bg-red-900/40 text-red-600 dark:text-red-400" @click="handleLogout">
                 <span>🚪 Logout</span>
                 <span class="arrow text-gray-400">›</span>
               </div>
@@ -709,9 +709,7 @@ onMounted(async () => {
 
 
 
-.setting-row:hover {
-  background: #e4e6eb;
-}
+
 
 
 
