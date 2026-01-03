@@ -511,11 +511,7 @@ onMounted(async () => {
   margin: 0;
 }
 
-  position: absolute;
-  top: 16px;
-  right: 24px;
-  cursor: pointer;
-}
+
 
 .posts-section {
   border-radius: 12px;
@@ -659,11 +655,7 @@ onMounted(async () => {
 
 
 /* Settings Button */
-  position: absolute;
-  top: 56px;
-  right: 24px;
-  cursor: pointer;
-}
+
 
 /* Settings Section */
 .settings-section {
@@ -715,17 +707,7 @@ onMounted(async () => {
 
 
 
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 14px 16px;
-  border-radius: 8px;
-  margin-bottom: 8px;
-  cursor: pointer;
-  transition: background 0.2s;
-  font-weight: 500;
-  color: #1c1e21;
-}
+
 
 .setting-row:hover {
   background: #e4e6eb;
