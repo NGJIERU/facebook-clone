@@ -31,6 +31,8 @@ public class MessageController {
         return authentication.getPrincipal().toString();
     }
 
+    private final org.springframework.kafka.core.KafkaTemplate<String, Object> kafkaTemplate;
+
     @PostMapping("/send")
     public ResponseEntity<?> sendMessage(@RequestBody Map<String, String> body) {
         String currentUserId = getCurrentUserId();
@@ -50,7 +52,25 @@ public class MessageController {
                 .build();
 
         Message saved = messageRepository.save(message);
-        log.info("Message sent from {} to {}", currentUserId, receiverId);
+        log.info("Message saved to DB from {} to {}", currentUserId, receiverId);
+
+        // Publish to Kafka for Real-time delivery
+        try {
+            var event = com.facebook.user.dto.ChatMessageEvent.builder()
+                    .id(saved.getId().toString())
+                    .senderId(saved.getSenderId())
+                    .receiverId(saved.getReceiverId())
+                    .content(saved.getContent())
+                    .createdAt(saved.getCreatedAt())
+                    .build();
+
+            kafkaTemplate.send("chat-messages", event);
+            log.info("Message published to Kafka: {}", event);
+        } catch (Exception e) {
+            log.error("Failed to publish message to Kafka", e);
+            // Don't fail the request, just log it. Message is saved in DB.
+        }
+
         return ResponseEntity.ok(saved);
     }
 
@@ -58,7 +78,7 @@ public class MessageController {
     public ResponseEntity<List<Message>> getConversation(@PathVariable String partnerId) {
         String currentUserId = getCurrentUserId();
         List<Message> messages = messageRepository.findConversation(currentUserId, partnerId);
-        
+
         // Mark messages as read
         messages.stream()
                 .filter(m -> m.getReceiverId().equals(currentUserId) && !m.isRead())
@@ -66,7 +86,7 @@ public class MessageController {
                     m.setRead(true);
                     messageRepository.save(m);
                 });
-        
+
         return ResponseEntity.ok(messages);
     }
 
@@ -74,7 +94,7 @@ public class MessageController {
     public ResponseEntity<?> getConversations() {
         String currentUserId = getCurrentUserId();
         List<Message> latestMessages = messageRepository.findLatestMessagesPerConversation(currentUserId);
-        
+
         // Enrich with user profile info
         var conversations = latestMessages.stream().map(msg -> {
             String partnerId = msg.getSenderId().equals(currentUserId) ? msg.getReceiverId() : msg.getSenderId();
@@ -82,14 +102,14 @@ public class MessageController {
             return Map.of(
                     "partnerId", partnerId,
                     "partnerName", profile != null ? profile.getUsername() : "Unknown",
-                    "partnerPic", profile != null && profile.getProfilePicUrl() != null ? profile.getProfilePicUrl() : "",
+                    "partnerPic",
+                    profile != null && profile.getProfilePicUrl() != null ? profile.getProfilePicUrl() : "",
                     "lastMessage", msg.getContent(),
                     "lastMessageTime", msg.getCreatedAt().toString(),
                     "isFromMe", msg.getSenderId().equals(currentUserId),
-                    "unread", !msg.isRead() && msg.getReceiverId().equals(currentUserId)
-            );
+                    "unread", !msg.isRead() && msg.getReceiverId().equals(currentUserId));
         }).toList();
-        
+
         return ResponseEntity.ok(conversations);
     }
 

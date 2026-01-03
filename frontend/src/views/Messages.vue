@@ -174,6 +174,8 @@ import { useAuthStore } from '../stores/auth';
 import { useFriendStore } from '../stores/friends';
 import api from '../utils/api';
 
+import { Client } from '@stomp/stompjs';
+
 const router = useRouter();
 const authStore = useAuthStore();
 const friendStore = useFriendStore();
@@ -189,11 +191,69 @@ const newMessage = ref('');
 const sending = ref(false);
 const showNewMessageModal = ref(false);
 const messagesContainer = ref(null);
+const stompClient = ref(null);
 
 onMounted(async () => {
   await fetchConversations();
   friendStore.fetchFriends();
+  connectWebSocket();
 });
+
+const connectWebSocket = () => {
+    if (stompClient.value && stompClient.value.active) return;
+    
+    // Determine WS URL (use current host to go through Vite proxy)
+    const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+    const brokerUrl = `${protocol}//${window.location.host}/ws`;
+
+    const client = new Client({
+        brokerURL: brokerUrl,
+        connectHeaders: {
+            Authorization: `Bearer ${authStore.token}`,
+        },
+        reconnectDelay: 5000,
+        heartbeatIncoming: 4000,
+        heartbeatOutgoing: 4000,
+        onConnect: () => {
+            console.log('Connected to WebSocket');
+            subscribeToChat();
+        },
+        onStompError: (frame) => {
+            console.error('Broker reported error: ' + frame.headers['message']);
+            console.error('Additional details: ' + frame.body);
+        },
+    });
+
+    client.activate();
+    stompClient.value = client;
+};
+
+const subscribeToChat = () => {
+    if (!stompClient.value || !authStore.user?.id) return;
+    
+    stompClient.value.subscribe(`/topic/chat/${authStore.user.id}`, (message) => {
+        const chatEvent = JSON.parse(message.body);
+        handleIncomingMessage(chatEvent);
+    });
+};
+
+const handleIncomingMessage = async (msg) => {
+    // If we are currently chatting with the sender, append the message
+    if (selectedPartnerId.value === msg.senderId) {
+        messages.value.push(msg);
+        await nextTick();
+        scrollToBottom();
+    } 
+    // If it's a message we sent (via another device), append it if currently viewing chat
+    else if (selectedPartnerId.value === msg.receiverId) {
+         messages.value.push(msg);
+         await nextTick();
+         scrollToBottom();
+    }
+
+    // Refresh conversations list to update "last message" and "unread" status
+    await fetchConversations();
+};
 
 const fetchConversations = async () => {
   loadingConversations.value = true;
