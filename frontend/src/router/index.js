@@ -24,6 +24,16 @@ const router = createRouter({
             component: Register
         },
         {
+            path: '/forgot-password',
+            name: 'forgot-password',
+            component: () => import('../views/ForgotPassword.vue')
+        },
+        {
+            path: '/reset-password',
+            name: 'reset-password',
+            component: () => import('../views/ResetPassword.vue')
+        },
+        {
             path: '/',
             name: 'feed',
             component: Feed,

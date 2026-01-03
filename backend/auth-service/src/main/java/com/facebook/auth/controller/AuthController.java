@@ -18,6 +18,7 @@ public class AuthController {
 
     private final AuthService service;
     private final com.facebook.auth.service.OAuthService oauthService;
+    private final com.facebook.auth.service.PasswordResetService passwordResetService;
 
     @PostMapping("/register")
     public ResponseEntity<AuthResponse> register(
@@ -72,5 +73,17 @@ public class AuthController {
     @PostMapping("/refresh-token")
     public ResponseEntity<?> refreshToken(@RequestBody com.facebook.auth.dto.RefreshTokenRequest request) {
         return ResponseEntity.ok(service.refreshToken(request));
+    }
+
+    @PostMapping("/forgot-password")
+    public ResponseEntity<?> forgotPassword(@RequestBody com.facebook.auth.dto.ForgotPasswordRequest request) {
+        passwordResetService.createPasswordResetTokenForUser(request.getEmail());
+        return ResponseEntity.ok(java.util.Map.of("message", "If an account exists, a reset link has been sent."));
+    }
+
+    @PostMapping("/reset-password")
+    public ResponseEntity<?> resetPassword(@RequestBody com.facebook.auth.dto.ResetPasswordRequest request) {
+        passwordResetService.resetPassword(request.getToken(), request.getNewPassword());
+        return ResponseEntity.ok(java.util.Map.of("message", "Password reset successfully."));
     }
 }

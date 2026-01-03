@@ -60,6 +60,28 @@ export const useAuthStore = defineStore('auth', {
             this.user = userData;
             localStorage.setItem('user', JSON.stringify(userData));
         },
+        async forgotPassword(email) {
+            try {
+                const response = await api.post('/auth/forgot-password', { email });
+                return { success: true, message: response.data.message };
+            } catch (error) {
+                return {
+                    success: false,
+                    message: getErrorMessage(error)
+                };
+            }
+        },
+        async resetPassword(token, newPassword) {
+            try {
+                const response = await api.post('/auth/reset-password', { token, newPassword });
+                return { success: true, message: response.data.message };
+            } catch (error) {
+                return {
+                    success: false,
+                    message: getErrorMessage(error)
+                };
+            }
+        },
         setToken(token) {
             this.token = token;
             localStorage.setItem('token', token);

@@ -27,7 +27,7 @@ watch(() => authStore.user, (newUser) => {
 
 // Check if current route should show navbar
 const showNavBar = () => {
-  const publicRoutes = ['/login', '/register', '/forgot-password'];
+  const publicRoutes = ['/login', '/register', '/forgot-password', '/reset-password'];
   return !publicRoutes.includes(route.path);
 };
 </script>

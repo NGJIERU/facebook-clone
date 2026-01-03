@@ -57,7 +57,10 @@ const handleLogin = async () => {
           <p v-if="error" class="text-red-500 text-sm mt-2">{{ error }}</p>
           <div class="flex items-baseline justify-between">
             <button class="px-6 py-2 mt-4 text-white bg-blue-600 rounded-lg hover:bg-blue-900 transition duration-200">Login</button>
-            <router-link to="/register" class="text-sm text-blue-600 hover:underline dark:text-blue-400">Register</router-link>
+            <div class="flex flex-col items-end">
+                <router-link to="/forgot-password" class="text-sm text-blue-600 hover:underline dark:text-blue-400 mb-2">Forgot Password?</router-link>
+                <router-link to="/register" class="text-sm text-blue-600 hover:underline dark:text-blue-400">Register</router-link>
+            </div>
           </div>
         </div>
       </form>
