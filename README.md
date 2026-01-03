@@ -203,7 +203,7 @@ sequenceDiagram
 
 ```bash
 # 1. Clone the repository
-git clone https://github.com/YOUR_USERNAME/facebook-clone.git
+git clone https://github.com/NGJIERU/facebook-clone.git
 cd facebook-clone
 
 # 2. Start all infrastructure and backend services
@@ -772,7 +772,10 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## 👥 Authors
 
-- **Your Name** - *Initial work* - [GitHub Profile](https://github.com/YOUR_USERNAME)
+- **NG JIE RU** - *Full-Stack Developer & Project Lead* - [GitHub](https://github.com/NGJIERU) | [LinkedIn](https://www.linkedin.com/in/NGJIERU/)
+  - Information System student at University of Malaya
+  - Computer enthusiast with passion for microservices architecture and cloud technologies
+  - 📧 Contact: jieru0901@gmail.com
 
 ---
 
@@ -790,8 +793,8 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 - 📧 Email: support@facebook-clone.com
 - 💬 Discord: [Join our community](https://discord.gg/facebook-clone)
-- 🐛 Issues: [GitHub Issues](https://github.com/YOUR_USERNAME/facebook-clone/issues)
-- 📖 Wiki: [Project Wiki](https://github.com/YOUR_USERNAME/facebook-clone/wiki)
+- 🐛 Issues: [GitHub Issues](https://github.com/NGJIERU/facebook-clone/issues)
+- 📖 Wiki: [Project Wiki](https://github.com/NGJIERU/facebook-clone/wiki)
 
 ---
 
