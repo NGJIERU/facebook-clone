@@ -39,10 +39,10 @@
               <p class="bio text-gray-500 dark:text-gray-400">{{ profile.bio || 'No bio yet' }}</p>
             </div>
             
-            <button v-if="isOwnProfile" @click="showEditModal = true" class="edit-button">
+            <button v-if="isOwnProfile" @click="showEditModal = true" class="edit-button bg-blue-600 text-white hover:bg-blue-700 px-4 py-2 rounded-md font-semibold">
               Edit Profile
             </button>
-            <button v-if="isOwnProfile" @click="showSettingsModal = true" class="settings-button">
+            <button v-if="isOwnProfile" @click="showSettingsModal = true" class="settings-button bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-gray-100 hover:bg-gray-300 dark:hover:bg-gray-600 px-4 py-2 rounded-md font-semibold">
               ⚙️ Settings
             </button>
           </div>
@@ -107,7 +107,7 @@
           <form @submit.prevent="saveProfile">
             <!-- Profile Picture -->
             <div class="form-group">
-              <label class="dark:text-white">Profile Picture</label>
+              <label class="text-gray-900 dark:text-gray-100">Profile Picture</label>
               <div class="flex items-center gap-4">
                 <div class="w-16 h-16 rounded-full overflow-hidden bg-blue-500 flex items-center justify-center">
                   <img v-if="editForm.profilePicUrl" :src="editForm.profilePicUrl" class="w-full h-full object-cover" />
@@ -121,7 +121,7 @@
             </div>
             <!-- Cover Picture -->
             <div class="form-group">
-              <label class="dark:text-white">Cover Photo</label>
+              <label class="text-gray-900 dark:text-gray-100">Cover Photo</label>
               <div class="w-full h-20 rounded overflow-hidden bg-gradient-to-r from-blue-500 to-purple-500">
                 <img v-if="editForm.coverPicUrl" :src="editForm.coverPicUrl" class="w-full h-full object-cover" />
               </div>
@@ -131,16 +131,16 @@
               </button>
             </div>
             <div class="form-group">
-              <label class="dark:text-white">Username</label>
-              <input v-model="editForm.username" type="text" required class="dark:bg-gray-700 dark:border-gray-600 dark:text-white">
+              <label class="text-gray-900 dark:text-gray-100">Username</label>
+              <input v-model="editForm.username" type="text" required class="bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-transparent">
             </div>
             <div class="form-group">
-              <label class="dark:text-white">Bio</label>
-              <textarea v-model="editForm.bio" rows="4" class="dark:bg-gray-700 dark:border-gray-600 dark:text-white"></textarea>
+              <label class="text-gray-900 dark:text-gray-100">Bio</label>
+              <textarea v-model="editForm.bio" rows="4" class="bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-transparent"></textarea>
             </div>
             <div class="form-actions">
-              <button type="button" @click="showEditModal = false" class="cancel-btn dark:bg-gray-600 dark:text-white">Cancel</button>
-              <button type="submit" class="save-btn">Save Changes</button>
+              <button type="button" @click="showEditModal = false" class="cancel-btn bg-gray-200 dark:bg-gray-600 hover:bg-gray-300 dark:hover:bg-gray-500 text-gray-800 dark:text-gray-100">Cancel</button>
+              <button type="submit" class="save-btn bg-blue-600 text-white hover:bg-blue-700">Save Changes</button>
             </div>
           </form>
         </div>
@@ -148,57 +148,57 @@
 
       <!-- Settings Modal -->
       <div v-if="showSettingsModal" class="modal-overlay" @click="showSettingsModal = false">
-        <div class="modal-content settings-modal dark:bg-gray-800" @click.stop>
+        <div class="modal-content settings-modal bg-white dark:bg-gray-800" @click.stop>
           <h2 class="dark:text-white">Settings</h2>
           
           <div class="settings-list">
             <div class="settings-category">
-              <h4 class="dark:text-gray-400">Account</h4>
-              <div class="setting-row dark:bg-gray-700 dark:text-gray-200" @click="showEditModal = true; showSettingsModal = false">
+              <h4 class="text-gray-500 dark:text-gray-400 text-sm font-semibold uppercase tracking-wide mb-2">Account</h4>
+              <div class="setting-row bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-900 dark:text-gray-100" @click="showEditModal = true; showSettingsModal = false">
                 <span>✏️ Edit Profile</span>
-                <span class="arrow">›</span>
+                <span class="arrow text-gray-400">›</span>
               </div>
-              <div class="setting-row dark:bg-gray-700 dark:text-gray-200" @click="router.push('/saved'); showSettingsModal = false">
+              <div class="setting-row bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-900 dark:text-gray-100" @click="router.push('/saved'); showSettingsModal = false">
                 <span>🔖 Saved Posts</span>
-                <span class="arrow">›</span>
+                <span class="arrow text-gray-400">›</span>
               </div>
             </div>
             
             <div class="settings-category">
-              <h4 class="dark:text-gray-400">Privacy</h4>
-              <div class="setting-row dark:bg-gray-700 dark:text-gray-200">
+              <h4 class="text-gray-500 dark:text-gray-400 text-sm font-semibold uppercase tracking-wide mb-2">Privacy</h4>
+              <div class="setting-row bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-900 dark:text-gray-100">
                 <span>🔒 Profile Visibility</span>
-                <span class="setting-value">Public</span>
+                <span class="setting-value text-gray-500 dark:text-gray-400 text-sm">Public</span>
               </div>
-              <div class="setting-row dark:bg-gray-700 dark:text-gray-200">
+              <div class="setting-row bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-900 dark:text-gray-100">
                 <span>👁️ Who can see my posts</span>
-                <span class="setting-value">Everyone</span>
+                <span class="setting-value text-gray-500 dark:text-gray-400 text-sm">Everyone</span>
               </div>
             </div>
             
             <div class="settings-category">
-              <h4 class="dark:text-gray-400">Notifications</h4>
-              <div class="setting-row dark:bg-gray-700 dark:text-gray-200">
+              <h4 class="text-gray-500 dark:text-gray-400 text-sm font-semibold uppercase tracking-wide mb-2">Notifications</h4>
+              <div class="setting-row bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-900 dark:text-gray-100">
                 <span>🔔 Push Notifications</span>
                 <label class="toggle">
                   <input type="checkbox" checked>
-                  <span class="slider"></span>
+                  <span class="slider bg-gray-300 dark:bg-gray-600"></span>
                 </label>
               </div>
-              <div class="setting-row dark:bg-gray-700 dark:text-gray-200">
+              <div class="setting-row bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-900 dark:text-gray-100">
                 <span>📧 Email Notifications</span>
                 <label class="toggle">
                   <input type="checkbox">
-                  <span class="slider"></span>
+                  <span class="slider bg-gray-300 dark:bg-gray-600"></span>
                 </label>
               </div>
             </div>
             
             <div class="settings-category danger">
-              <h4 class="dark:text-red-400">Danger Zone</h4>
-              <div class="setting-row danger dark:bg-gray-700" @click="handleLogout">
+              <h4 class="text-red-600 dark:text-red-400 text-sm font-semibold uppercase tracking-wide mb-2">Danger Zone</h4>
+              <div class="setting-row danger bg-red-50 dark:bg-red-900/20 hover:bg-red-100 dark:hover:bg-red-900/40 text-red-600 dark:text-red-400" @click="handleLogout">
                 <span>🚪 Logout</span>
-                <span class="arrow">›</span>
+                <span class="arrow text-gray-400">›</span>
               </div>
             </div>
           </div>
@@ -511,21 +511,10 @@ onMounted(async () => {
   margin: 0;
 }
 
-.edit-button {
   position: absolute;
   top: 16px;
   right: 24px;
-  padding: 8px 16px;
-  background: #1877f2;
-  color: white;
-  border: none;
-  border-radius: 6px;
   cursor: pointer;
-  font-weight: 600;
-}
-
-.edit-button:hover {
-  background: #166fe5;
 }
 
 .posts-section {
@@ -633,30 +622,19 @@ onMounted(async () => {
   display: block;
   margin-bottom: 8px;
   font-weight: 600;
-  color: #1c1e21;
   font-size: 15px;
-}
-
-:global(.dark) .form-group label {
-  color: #ffffff !important;
 }
 
 .form-group input,
 .form-group textarea {
   width: 100%;
   padding: 10px 12px;
-  border: 1px solid #ccd0d5;
   border-radius: 6px;
   font-size: 15px;
   font-family: inherit;
 }
 
-:global(.dark) .form-group input,
-:global(.dark) .form-group textarea {
-  background: #111827;
-  border-color: #374151;
-  color: #f3f4f6;
-}
+
 
 .form-group textarea {
   resize: vertical;
@@ -678,49 +656,13 @@ onMounted(async () => {
   border: none;
 }
 
-.cancel-btn {
-  background: #e4e6eb;
-  color: #1c1e21;
-}
 
-.cancel-btn:hover {
-  background: #d8dadf;
-}
-
-.save-btn {
-  background: #1877f2;
-  color: white;
-}
-
-.save-btn:hover {
-  background: #166fe5;
-}
 
 /* Settings Button */
-.settings-button {
   position: absolute;
   top: 56px;
   right: 24px;
-  padding: 8px 16px;
-  background: #e4e6eb;
-  color: #1c1e21;
-  border: none;
-  border-radius: 6px;
   cursor: pointer;
-  font-weight: 600;
-}
-
-.settings-button:hover {
-  background: #d8dadf;
-}
-
-:global(.dark) .settings-button {
-  background: #374151;
-  color: #e5e7eb;
-}
-
-:global(.dark) .settings-button:hover {
-  background: #4b5563;
 }
 
 /* Settings Section */
@@ -771,29 +713,12 @@ onMounted(async () => {
   margin-bottom: 20px;
 }
 
-.settings-category h4 {
-  margin: 0 0 10px;
-  font-size: 14px;
-  color: #65676b;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  font-weight: 600;
-}
 
-:global(.dark) .settings-category h4 {
-  color: #d1d5db;
-}
 
-.settings-category.danger h4 {
-  color: #dc2626;
-}
-
-.setting-row {
   display: flex;
   justify-content: space-between;
   align-items: center;
   padding: 14px 16px;
-  background: #f0f2f5;
   border-radius: 8px;
   margin-bottom: 8px;
   cursor: pointer;
@@ -806,44 +731,14 @@ onMounted(async () => {
   background: #e4e6eb;
 }
 
-:global(.dark) .setting-row {
-  background: #374151;
-  color: #f3f4f6;
-  border: 1px solid #4b5563;
-}
 
-:global(.dark) .setting-row:hover {
-  background: #4b5563;
-}
 
-:global(.dark) .setting-row:hover {
-  background: #4b5563;
-}
 
-.setting-row.danger {
-  color: #dc2626;
-}
 
-.setting-row.danger:hover {
-  background: #fef2f2;
-}
 
-:global(.dark) .setting-row.danger:hover {
-  background: #450a0a;
-}
-
-.setting-value {
-  color: #65676b;
-  font-size: 14px;
-}
-
-:global(.dark) .setting-value {
-  color: #9ca3af;
-}
 
 .arrow {
   font-size: 18px;
-  color: #65676b;
 }
 
 /* Toggle Switch */
@@ -867,8 +762,6 @@ onMounted(async () => {
   left: 0;
   right: 0;
   bottom: 0;
-  background-color: #ccc;
-  transition: 0.3s;
   border-radius: 24px;
 }
 
@@ -892,12 +785,5 @@ onMounted(async () => {
   transform: translateX(20px);
 }
 
-:global(.dark) .cancel-btn {
-  background: #374151;
-  color: #e5e7eb;
-}
 
-:global(.dark) .cancel-btn:hover {
-  background: #4b5563;
-}
 </style>
